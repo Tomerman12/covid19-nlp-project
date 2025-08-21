@@ -1,6 +1,6 @@
 # COVID-19 NLP Project
 
-This repository contains two Jupyter notebooks implementing **Part A** (Exploratory Data Analysis & text preprocessing) and **Part B** (model fine‑tuning and compression) for the COVID‑19 tweet sentiment classification assignment.
+This repository contains two colab notebooks implementing **Part A** (Exploratory Data Analysis & text preprocessing) and **Part B** (model fine‑tuning and compression) for the COVID‑19 tweet sentiment classification assignment.
 
 ## Structure
 
