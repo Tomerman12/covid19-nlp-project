@@ -179,31 +179,41 @@ button{font-family:inherit;cursor:pointer}
 }
 .reel{
   position:relative;flex:1;overflow:hidden;border-radius:4px;
-  background:linear-gradient(180deg,#FFFFFF 0%,#FEFAF8 40%,#F6EAE4 100%);
+  background:linear-gradient(180deg,#F2E7E1 0%,#FFFFFF 26%,#FFFDFC 50%,#FAF1EC 74%,#EFE2DB 100%);
   box-shadow:
-    inset 0 7px 9px -6px rgba(110,60,72,.5),
-    inset 0 -7px 9px -6px rgba(110,60,72,.5),
+    inset 0 8px 10px -6px rgba(110,60,72,.55),
+    inset 0 -8px 10px -6px rgba(110,60,72,.55),
     0 1px 0 rgba(255,255,255,.6);
 }
-.reel::after{ /* השתקפות זכוכית */
-  content:"";position:absolute;inset:0;pointer-events:none;border-radius:4px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,0) 24%,rgba(0,0,0,0) 62%,rgba(90,45,60,.13) 100%),
-    linear-gradient(112deg,rgba(255,255,255,0) 42%,rgba(255,255,255,.4) 50%,rgba(255,255,255,0) 60%);
-}
+.reel.jolt{animation:reelJolt .26s cubic-bezier(.36,.07,.19,.97)}
+@keyframes reelJolt{0%{transform:translateY(0)}28%{transform:translateY(2px)}58%{transform:translateY(-.7px)}100%{transform:translateY(0)}}
+
+/* רצועת הסמלים — פריט נמוך מהחלון, כך שחצי סמל מציץ מעל ומתחת */
+.strip.mb-a{filter:url(#mbA)}
+.strip.mb-b{filter:url(#mbB)}
 .strip{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  transform:translateY(0);will-change:transform;
+  position:absolute;left:0;right:0;top:0;
+  padding-top:var(--pad,12px);
+  will-change:transform;
 }
-.strip.spin{filter:blur(1.6px)}
 .strip i{
-  flex:0 0 100%;display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;
+  height:var(--ih,40px);
   font-style:normal;font-family:var(--serif);font-weight:600;
-  font-size:clamp(16px,5.8vw,25px);
+  font-size:1em;
   color:#4A2E37;
-  text-shadow:0 1px 0 rgba(255,255,255,.9);
 }
-.strip i.h{color:#D79BAC;font-size:clamp(17px,6.2vw,27px);text-shadow:none}
+.strip i.h{color:#D79BAC;font-size:1.1em}
+
+/* הצללת הגליל: מחשיכה ומכווצת את הקצוות כדי לתת תחושת תוף מתעגל */
+.reel::after{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:4px;z-index:3;
+  background:
+    linear-gradient(180deg,
+      rgba(74,32,46,.4) 0%,rgba(74,32,46,.2) 9%,rgba(74,32,46,.05) 22%,rgba(74,32,46,0) 36%,
+      rgba(74,32,46,0) 64%,rgba(74,32,46,.06) 79%,rgba(74,32,46,.22) 91%,rgba(74,32,46,.42) 100%),
+    linear-gradient(112deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 63%);
+}
 
 /* כפתורים */
 .btnrow{position:absolute;left:23%;top:61.5%;width:54%;height:3.4%;display:flex;justify-content:space-between}
@@ -441,6 +451,13 @@ button{font-family:inherit;cursor:pointer}
 <body>
 
 <!-- ========================= מסך 1 — מכונת המזל ========================= -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <filter id="mbA" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="0 3.8"/></filter>
+    <filter id="mbB" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="0 1.4"/></filter>
+  </defs>
+</svg>
+
 <section id="stage-slot">
   <p class="eyebrow" dir="ltr">Together with their families</p>
   <h1 class="save-title" dir="ltr">Save the Date</h1>
@@ -739,57 +756,149 @@ const pullBtn   = document.getElementById('pullBtn');
 const hint      = document.getElementById('hint');
 const revealEl  = document.getElementById('revealDate');
 const openBtn   = document.getElementById('openInvite');
-const ITEMS     = 16;                 // מספר הפריטים ברצועה
-const FINAL     = ITEMS - 1;          // מיקום המספר הסופי
-let spinning = false, done = false;
+const lever     = document.querySelector('.lever');
+
+/* הגלגל בנוי כרצועה מחזורית: רצף של 12 סמלים שחוזר על עצמו, כך שהסיבוב
+   עובר כמה "הקפות" שלמות לפני שהוא נועל על הסמל המבוקש.
+   מבנה הסיבוב (נסיגה → האצה → מהירות קבועה → האטה → חריגה → נעילה)
+   מבוסס על slot-machine-gen מאת Marc S. Brooks, רישיון MIT. */
+const SEQ    = 12;   // אורך הרצף
+const LOOPS  = 8;    // כמה פעמים הרצף חוזר ברצועה
+const REELS  = [];
+let spinning = false, done = false, audio = null;
 
 function pad(n){ return String(n).padStart(2,'0'); }
 
-// בניית שלוש הרצועות: לב בהתחלה, מספרים אקראיים, ובסוף התאריך
 CONFIG.reels.forEach((target, r) => {
   const strip = document.getElementById('s' + r);
-  let html = '<i class="h">&#9825;</i>';
-  for (let i = 1; i < FINAL; i++) html += '<i>' + pad(Math.floor(Math.random()*31)+1) + '</i>';
-  html += '<i>' + target + '</i>';
+  const reel  = strip.parentElement;
+  const stop  = 5 + r;                       // כל גלגל נעצר במקום אחר ברצף
+  const seq   = [];
+  for (let i = 0; i < SEQ; i++) {
+    if (i === stop) seq.push(target);
+    else if (i === 0 || i === 9) seq.push('&#9825;');
+    else seq.push(pad(Math.floor(Math.random() * 31) + 1));
+  }
+  let html = '';
+  for (let l = 0; l < LOOPS; l++) {
+    html += seq.map(t => '<i class="' + (t === '&#9825;' ? 'h' : '') + '">' + t + '</i>').join('');
+  }
   strip.innerHTML = html;
+  REELS.push({ strip: strip, reel: reel, stop: stop, ih: 0 });
 });
+
+/* גובה פריט קטן מגובה החלון — ככה נראים חצאי סמלים מעל ומתחת */
+function layout(){
+  REELS.forEach(R => {
+    const h = R.reel.clientHeight;
+    if (!h) return;
+    R.ih = h / 1.9;                            // צפוף מספיק כדי שחצאי סמלים יציצו מעל ומתחת
+    R.strip.style.setProperty('--ih', R.ih.toFixed(2) + 'px');
+    R.strip.style.setProperty('--pad', ((h - R.ih) / 2).toFixed(2) + 'px');
+    R.strip.style.fontSize = (R.ih * 0.66).toFixed(2) + 'px';
+    if (!spinning) {
+      const idx = done ? (SEQ * (LOOPS - 2) + R.stop) : SEQ;
+      R.strip.style.transform = 'translateY(' + (-idx * R.ih).toFixed(2) + 'px)';
+    }
+  });
+}
+layout();
+window.addEventListener('resize', layout);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+/* קליק מכני קצר — נוצר ב-Web Audio, בלי קבצי סאונד */
+function tick(freq, vol, len){
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === 'suspended') audio.resume();
+    const osc  = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, audio.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.55, audio.currentTime + len);
+    gain.gain.setValueAtTime(vol, audio.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + len);
+    osc.connect(gain).connect(audio.destination);
+    osc.start();
+    osc.stop(audio.currentTime + len + 0.02);
+  } catch (e) { /* בלי סאונד — לא נורא */ }
+}
 
 function spin(){
   if (spinning || done) return;
   spinning = true;
   machine.classList.remove('armed');
-  machine.classList.add('pulled');
+  hint.classList.add('hide');
+  layout();
+
+  /* משיכת הידית: ירידה מהירה, ואז חזרה קפיצית */
+  lever.animate(
+    [{ transform:'rotate(24deg)' }, { transform:'rotate(64deg)' }],
+    { duration:170, easing:'cubic-bezier(.4,0,.9,.5)', fill:'forwards' }
+  ).onfinish = () => {
+    lever.animate(
+      [{ transform:'rotate(64deg)' }, { transform:'rotate(24deg)' }],
+      { duration:640, easing:'cubic-bezier(.22,1.5,.5,1)', fill:'forwards' }
+    );
+  };
   machine.classList.add('shaking');
   setTimeout(() => machine.classList.remove('shaking'), 600);
-  hint.classList.add('hide');
+  tick(90, .09, .13);
 
-  // הידית חוזרת למקומה
-  setTimeout(() => machine.classList.remove('pulled'), 520);
+  const durations = [2400, 3050, 3700];
+  REELS.forEach((R, i) => {
+    const dur  = durations[i];
+    const ih   = R.ih;
+    const idx   = SEQ * (LOOPS - 2) + R.stop;   // כמה פריטים עוברים עד לעצירה
+    const end   = -idx * ih;
+    const start = -SEQ * ih;                   // מצב המנוחה
 
-  const durations = [1900, 2600, 3300];
-  CONFIG.reels.forEach((_, r) => {
-    const strip = document.getElementById('s' + r);
-    strip.classList.add('spin');
-    strip.style.transition = 'transform ' + durations[r] + 'ms cubic-bezier(.12,.72,.16,1)';
-    // דילוג ל־0 ואז לסיבוב מלא, כדי שייראה כמו כמה סיבובים
-    requestAnimationFrame(() => {
-      strip.style.transform = 'translateY(-' + (FINAL * 100) + '%)';
-    });
-    // הטשטוש נעלם רגע לפני שהגלגל נעצר
-    setTimeout(() => strip.classList.remove('spin'), durations[r] - 320);
+    R.anim = R.strip.animate([
+      // נסיגה קטנה למעלה לפני שהגלגל יוצא לדרך
+      { transform:'translateY(' + start + 'px)',              offset:0,    easing:'cubic-bezier(.3,0,.6,1)' },
+      { transform:'translateY(' + (start + ih * 0.22) + 'px)', offset:0.06, easing:'cubic-bezier(.45,0,.95,.55)' },
+      // האצה ואז מהירות קבועה
+      { transform:'translateY(' + (end * 0.26) + 'px)', offset:0.34, easing:'linear' },
+      { transform:'translateY(' + (end * 0.72) + 'px)', offset:0.72, easing:'cubic-bezier(.22,.62,.4,1)' },
+      // האטה, חריגה קטנה מעבר לסמל, ונעילה חזרה עליו
+      { transform:'translateY(' + (end - ih * 0.34) + 'px)', offset:0.93, easing:'cubic-bezier(.3,0,.25,1)' },
+      { transform:'translateY(' + end + 'px)',          offset:1 }
+    ], { duration: dur, fill:'forwards', easing:'linear' });
+
+    /* טשטוש תנועה אנכי, לפי שלב הסיבוב */
+    setTimeout(() => R.strip.classList.add('mb-a'),    dur * 0.10);
+    setTimeout(() => R.strip.classList.replace('mb-a','mb-b'), dur * 0.78);
+    setTimeout(() => R.strip.classList.remove('mb-b'), dur * 0.95);
+
+    /* נעילת המצב הסופי, כדי שהתוצאה לא תיעלם כשהאנימציה מסתיימת */
+    R.anim.onfinish = () => {
+      R.strip.style.transform = 'translateY(' + end + 'px)';
+      R.strip.classList.remove('mb-a','mb-b');
+      R.anim.cancel();
+      R.anim = null;
+    };
+
+    /* רגע הנעילה: זעזוע קצר וקליק מכני */
+    setTimeout(() => {
+      R.reel.classList.add('jolt');
+      tick(150 + i * 26, .07, .09);
+      setTimeout(() => R.reel.classList.remove('jolt'), 260);
+    }, dur - 60);
   });
 
-  setTimeout(finish, durations[durations.length - 1] + 250);
+  setTimeout(finish, durations[durations.length - 1] + 240);
 }
 
 function finish(){
   done = true;
+  spinning = false;
   machine.classList.add('lit');
   hint.classList.add('gone');
   revealEl.textContent = CONFIG.dateLabel;
   revealEl.classList.add('show');
   openBtn.classList.add('show');
   confetti(80);
+  tick(320, .06, .25);
   if (navigator.vibrate) { try { navigator.vibrate([18, 60, 18]); } catch(e){} }
 }
 
