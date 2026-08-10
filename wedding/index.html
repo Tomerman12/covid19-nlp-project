@@ -24,6 +24,7 @@
   --terra:#C4703F;
   --line:2.4px;
   --maxw:520px;
+  --serif: "Didot", "Bodoni 72", "Playfair Display", "Hoefler Text", "Baskerville", Georgia, "Times New Roman", serif;
   --font: "Segoe UI", -apple-system, BlinkMacSystemFont, "Noto Sans Hebrew", "Arial Hebrew", Arial, sans-serif;
 }
 
@@ -39,145 +40,293 @@ body{
 img,svg{max-width:100%;display:block}
 button{font-family:inherit;cursor:pointer}
 
-/* ---------- מסך 1: מכונת המזל ---------- */
+/* ---------- מסך 1: מכונת המזל (רנדר תלת־ממד) ---------- */
 #stage-slot{
   min-height:100svh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:clamp(10px,3vw,20px);
-  padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 28px);
-  text-align:center;
-  position:relative;
+  padding:calc(env(safe-area-inset-top) + 26px) 18px calc(env(safe-area-inset-bottom) + 26px);
+  text-align:center;position:relative;overflow:hidden;
+  background:
+    radial-gradient(150% 90% at 50% -10%, #FDF1F4 0%, #F7E2EA 34%, #EFD3E4 62%, #E2C6DF 84%, #D8BEDA 100%);
   transition:opacity .7s ease, transform .7s ease;
 }
 #stage-slot.gone{opacity:0;transform:scale(.96);pointer-events:none}
 
 .eyebrow{
-  font-size:clamp(9px,2.7vw,11px);
-  letter-spacing:.42em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-  margin:0 0 2px;
-  padding-inline-start:.42em;
+  font-family:var(--serif);
+  font-size:clamp(8.5px,2.5vw,10.5px);
+  letter-spacing:.52em;text-transform:uppercase;
+  color:#8A6572;margin:0;padding-inline-start:.52em;
 }
 .save-title{
-  margin:0;
-  font-size:clamp(30px,9.5vw,46px);
-  font-weight:800;
-  letter-spacing:.01em;
-  color:var(--green-deep);
-  line-height:1.05;
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(36px,11.5vw,54px);
+  color:#3D272E;margin:6px 0 0;line-height:1.02;
 }
 .save-sub{
-  margin:6px 0 0;
-  font-size:clamp(13px,4vw,16px);
-  letter-spacing:.24em;
-  color:var(--ink);
-  padding-inline-start:.24em;
+  font-family:var(--serif);
+  font-size:clamp(14px,4.3vw,18px);
+  letter-spacing:.24em;color:#5C3D48;margin:8px 0 0;padding-inline-start:.24em;
 }
+.save-sub b{color:#CE8FA1;font-weight:400}
 
-/* המכונה */
+/* ===== המכונה ===== */
 .machine-wrap{
   position:relative;
-  width:min(78vw,300px);
-  aspect-ratio:300/430;
-  margin:clamp(4px,2vw,14px) auto 0;
+  width:min(72vw,278px);
+  aspect-ratio:278/450;
+  margin:clamp(12px,3.5vw,24px) auto 0;
   touch-action:manipulation;
 }
-.machine-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.m-line{fill:none;stroke:var(--green-deep);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-.m-thin{fill:none;stroke:var(--green-deep);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.m-fill-soft{fill:rgba(143,174,131,.14)}
-.m-arc-text{font-size:19px;font-weight:800;letter-spacing:2.2px;fill:var(--green-deep)}
+.machine-wrap::after{ /* צל מגע ברצפה */
+  content:"";position:absolute;left:4%;bottom:-2.5%;width:92%;height:5%;
+  border-radius:50%;
+  background:radial-gradient(closest-side,rgba(122,62,84,.42),rgba(122,62,84,0) 100%);
+  filter:blur(4px);
+}
+.machine-wrap.shaking{animation:machineShake .55s cubic-bezier(.36,.07,.19,.97)}
+@keyframes machineShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-2px) rotate(-.35deg)}
+  45%{transform:translateX(2.5px) rotate(.35deg)}
+  70%{transform:translateX(-1.5px) rotate(-.2deg)}
+}
 
-.bulb{fill:#fff;stroke:var(--green-deep);stroke-width:2.2}
-.machine-wrap.lit .bulb{animation:bulbPop .7s ease-in-out infinite alternate}
-.machine-wrap.lit .bulb:nth-of-type(even){animation-delay:.35s}
-@keyframes bulbPop{from{fill:#fff}to{fill:var(--terra)}}
+/* גוף המכונה */
+.cabinet{
+  position:absolute;left:6%;top:0;width:88%;height:86%;
+  border-radius:50% 50% 4% 4% / 31% 31% 3% 3%;
+  background:
+    linear-gradient(158deg,#FDEFF3 0%,#F6DCE3 22%,#EDC4D0 52%,#E0AABB 78%,#D296AA 100%);
+  box-shadow:
+    inset 0 4px 7px rgba(255,255,255,.95),
+    inset 9px 2px 16px rgba(255,255,255,.5),
+    inset -14px -8px 30px rgba(158,92,116,.42),
+    inset 0 -26px 34px rgba(150,84,108,.24),
+    0 30px 44px -20px rgba(112,54,76,.55),
+    0 6px 14px -6px rgba(112,54,76,.35);
+}
+.cabinet::before{ /* הבהק העליון */
+  content:"";position:absolute;left:9%;top:3%;width:36%;height:44%;
+  border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,255,255,.85),rgba(255,255,255,0) 72%);
+  filter:blur(7px);pointer-events:none;
+}
+.cabinet::after{ /* הצללת הצד הימני */
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(102deg,rgba(255,255,255,0) 52%,rgba(150,82,106,.2) 92%,rgba(150,82,106,.3) 100%);
+}
 
-/* ידית */
-#lever{cursor:grab;transform-origin:250px 208px;transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
-#lever:active{cursor:grabbing}
-.machine-wrap.pulled #lever{transform:rotate(58deg)}
-.machine-wrap.armed #lever{animation:leverHint 2.6s ease-in-out infinite}
-@keyframes leverHint{0%,72%,100%{transform:rotate(0)}82%{transform:rotate(13deg)}}
-.knob{fill:var(--terra);stroke:var(--green-deep);stroke-width:2.2}
+/* כותרת מוטבעת בקשת */
+.marquee{position:absolute;left:6%;top:0;width:88%;height:auto;overflow:visible}
+.mq{font-family:var(--serif);font-size:18.5px;font-weight:600;letter-spacing:2.4px}
 
-/* חלון הגלגלים */
+/* נורות */
+.bulbs{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.bulb{
+  position:absolute;width:8%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FBE6EC 34%,#E1AFC0 72%,#C98BA1 100%);
+  box-shadow:
+    inset 0 -2.5px 4px rgba(150,82,106,.5),
+    inset 0 2px 3px rgba(255,255,255,.95),
+    0 2px 4px rgba(140,76,100,.35);
+}
+.machine-wrap.lit .bulb{animation:bulbGlow .78s ease-in-out infinite alternate}
+.machine-wrap.lit .bulb:nth-child(2){animation-delay:.13s}
+.machine-wrap.lit .bulb:nth-child(3){animation-delay:.26s}
+.machine-wrap.lit .bulb:nth-child(4){animation-delay:.39s}
+.machine-wrap.lit .bulb:nth-child(5){animation-delay:.52s}
+@keyframes bulbGlow{
+  from{background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FBE6EC 34%,#E1AFC0 72%,#C98BA1 100%);
+       box-shadow:inset 0 -2.5px 4px rgba(150,82,106,.5),inset 0 2px 3px rgba(255,255,255,.95),0 2px 4px rgba(140,76,100,.35)}
+  to{background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FFE9CF 30%,#F4B27E 68%,#DE8E63 100%);
+     box-shadow:inset 0 -2.5px 4px rgba(150,82,60,.45),inset 0 2px 3px rgba(255,255,255,.95),0 0 12px rgba(246,175,120,.85),0 2px 4px rgba(140,76,100,.35)}
+}
+
+/* פס התאורה */
+.lightbar{
+  position:absolute;left:15%;top:30.5%;width:70%;height:5%;
+  border-radius:999px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 7%;
+  background:linear-gradient(180deg,#D69FB2 0%,#E7BAC8 45%,#F3D5DE 100%);
+  box-shadow:
+    inset 0 2.5px 5px rgba(126,64,88,.5),
+    inset 0 -2px 2px rgba(255,255,255,.6),
+    0 1px 0 rgba(255,255,255,.6);
+}
+.lightbar i{
+  width:8.5%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#FFF 0%,#F0B9C8 55%,#D3899F 100%);
+  box-shadow:inset 0 -1px 1px rgba(150,82,106,.5),0 0 4px rgba(226,150,175,.7);
+}
+
+/* מסגרת רוז־גולד למסך */
+.screen{
+  position:absolute;left:10.5%;top:37%;width:79%;height:21.5%;
+  border-radius:13px;padding:3.4%;
+  background:linear-gradient(148deg,#F3D9C4 0%,#D2A183 26%,#B9805F 46%,#F0D6C1 62%,#C08E6C 82%,#A8714F 100%);
+  box-shadow:
+    inset 0 1.5px 1px rgba(255,255,255,.85),
+    inset 0 -2px 3px rgba(110,60,40,.45),
+    0 8px 14px -6px rgba(120,62,74,.5);
+}
 .window{
-  position:absolute;
-  direction:ltr;
-  left:23.4%; top:38.2%; width:53.2%; height:19.6%;
-  display:flex; gap:2.5%;
-  padding:2.5%;
-  overflow:hidden;
-  border-radius:4px;
+  position:relative;width:100%;height:100%;direction:ltr;
+  display:flex;gap:3.2%;padding:3.4%;
+  background:linear-gradient(180deg,#EFE4DE,#F9F2EE);
+  border-radius:7px;
+  box-shadow:inset 0 3px 7px rgba(110,60,72,.4),inset 0 -2px 4px rgba(110,60,72,.22);
 }
 .reel{
-  position:relative;flex:1;overflow:hidden;
-  background:#fff;
-  border:2px solid var(--green-deep);
-  border-radius:3px;
+  position:relative;flex:1;overflow:hidden;border-radius:4px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FEFAF8 40%,#F6EAE4 100%);
+  box-shadow:
+    inset 0 7px 9px -6px rgba(110,60,72,.5),
+    inset 0 -7px 9px -6px rgba(110,60,72,.5),
+    0 1px 0 rgba(255,255,255,.6);
+}
+.reel::after{ /* השתקפות זכוכית */
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:4px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,0) 24%,rgba(0,0,0,0) 62%,rgba(90,45,60,.13) 100%),
+    linear-gradient(112deg,rgba(255,255,255,0) 42%,rgba(255,255,255,.4) 50%,rgba(255,255,255,0) 60%);
 }
 .strip{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  transform:translateY(0);
-  will-change:transform;
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  transform:translateY(0);will-change:transform;
 }
+.strip.spin{filter:blur(1.6px)}
 .strip i{
-  flex:0 0 100%;
-  display:flex;align-items:center;justify-content:center;
-  font-style:normal;font-weight:800;
-  font-size:clamp(15px,5.6vw,24px);
-  color:var(--green-deep);
-  letter-spacing:.02em;
+  flex:0 0 100%;display:flex;align-items:center;justify-content:center;
+  font-style:normal;font-family:var(--serif);font-weight:600;
+  font-size:clamp(16px,5.8vw,25px);
+  color:#4A2E37;
+  text-shadow:0 1px 0 rgba(255,255,255,.9);
 }
-.strip i.h{color:var(--green);font-size:clamp(16px,6vw,26px)}
-.reel::after{ /* הצללה עדינה בקצוות החלון */
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,0) 26%,rgba(0,0,0,0) 74%,rgba(0,0,0,.10));
+.strip i.h{color:#D79BAC;font-size:clamp(17px,6.2vw,27px);text-shadow:none}
+
+/* כפתורים */
+.btnrow{position:absolute;left:23%;top:61.5%;width:54%;height:3.4%;display:flex;justify-content:space-between}
+.btnrow i{
+  width:28%;height:100%;border-radius:999px;
+  background:linear-gradient(180deg,#FBE6EC 0%,#EEC3D0 45%,#D89FB2 100%);
+  box-shadow:
+    inset 0 1.5px 1px rgba(255,255,255,.95),
+    inset 0 -1.5px 2px rgba(150,82,106,.45),
+    0 2.5px 4px -1px rgba(140,76,100,.45);
+}
+.coinslot{
+  position:absolute;left:33%;top:67.5%;width:34%;height:2.4%;border-radius:999px;
+  background:linear-gradient(180deg,#B87C93 0%,#D9A0B2 60%,#EFCBD6 100%);
+  box-shadow:inset 0 2.5px 4px rgba(112,52,74,.65),0 1px 0 rgba(255,255,255,.75);
+}
+
+/* מגש */
+.tray{
+  position:absolute;left:12.5%;top:72.5%;width:75%;height:18.5%;border-radius:26px;
+  background:linear-gradient(168deg,#DDA6B7 0%,#EFCAD6 38%,#E7B8C7 70%,#D398AB 100%);
+  box-shadow:
+    inset 0 7px 16px rgba(124,62,86,.42),
+    inset 0 -3px 4px rgba(255,255,255,.6),
+    0 2px 3px rgba(255,255,255,.5);
+}
+.tray i{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:23%;aspect-ratio:1.35;border-radius:50%;
+  background:
+    radial-gradient(120% 150% at 38% 26%,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 52%),
+    linear-gradient(168deg,#EFD2B9 0%,#DCB294 46%,#C89A76 78%,#B5855F 100%);
+  box-shadow:
+    inset 0 -1.5px 3px rgba(110,58,38,.35),
+    inset 0 1.5px 2px rgba(255,255,255,.65),
+    0 2px 5px -1px rgba(120,62,74,.45);
+}
+
+/* בסיס */
+.base{
+  position:absolute;left:1%;top:84.5%;width:98%;height:9.5%;
+  border-radius:9px 9px 13px 13px;
+  background:linear-gradient(180deg,#F4D2DC 0%,#E0AABB 38%,#CC91A5 72%,#BC8095 100%);
+  box-shadow:
+    inset 0 2.5px 2px rgba(255,255,255,.9),
+    inset -8px 0 14px rgba(150,82,106,.3),
+    0 18px 26px -14px rgba(104,50,72,.6);
+}
+
+/* ידית */
+.mount{
+  position:absolute;left:83%;top:50%;width:11%;aspect-ratio:1;border-radius:50%;
+  background:
+    radial-gradient(circle at 36% 30%,rgba(255,255,255,.8) 0%,rgba(255,255,255,0) 48%),
+    linear-gradient(160deg,#F0D3BA 0%,#D2A382 45%,#B07D59 100%);
+  box-shadow:inset 0 -2px 3px rgba(110,58,38,.5),0 2px 4px rgba(120,62,74,.45);
+}
+.lever{
+  position:absolute;left:78.5%;top:29.3%;width:20%;height:24%;
+  transform-origin:50% 100%;transform:rotate(24deg);
+  transition:transform .5s cubic-bezier(.34,1.4,.64,1);
+}
+.machine-wrap.pulled .lever{transform:rotate(50deg)}
+.machine-wrap.armed .lever{animation:leverHint 3s ease-in-out infinite}
+@keyframes leverHint{0%,74%,100%{transform:rotate(24deg)}84%{transform:rotate(38deg)}}
+.lever .rod{
+  position:absolute;left:40%;bottom:0;width:20%;height:88%;border-radius:999px;
+  background:linear-gradient(90deg,#95633F 0%,#CFA07C 22%,#F7E5D4 44%,#C79878 68%,#8B5B3C 100%);
+  box-shadow:0 2px 5px rgba(120,62,74,.45);
+}
+.lever .ball{
+  position:absolute;left:50%;top:0;transform:translate(-50%,-46%);
+  width:64%;aspect-ratio:1;border-radius:50%;
+  background:
+    radial-gradient(circle at 32% 25%,rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 34%),
+    radial-gradient(circle at 42% 38%,#EE6D74 0%,#D8404E 40%,#AC1E33 74%,#780E26 100%);
+  box-shadow:
+    inset -4px -5px 10px rgba(80,8,24,.55),
+    0 7px 12px -4px rgba(120,34,52,.6);
 }
 
 /* טקסט מתחת למכונה */
 .pull-hint{
-  margin:clamp(8px,3vw,16px) 0 0;
-  font-size:clamp(12px,3.6vw,15px);
-  letter-spacing:.2em;
-  color:var(--ink);
-  padding-inline-start:.2em;
+  margin:clamp(14px,4vw,22px) 0 0;
+  font-family:var(--serif);
+  font-size:clamp(11px,3.3vw,13.5px);
+  letter-spacing:.34em;text-transform:uppercase;
+  color:#3D272E;padding-inline-start:.34em;
   transition:opacity .4s ease;
 }
-.pull-hint small{display:block;margin-top:8px;font-size:.72em;letter-spacing:.16em;color:var(--ink-soft)}
+.pull-hint small{display:block;margin-top:9px;font-size:.8em;letter-spacing:.28em;color:#8A6572}
+.pull-hint .he{
+  display:block;margin-top:11px;font-family:var(--font);
+  font-size:.92em;letter-spacing:.1em;text-transform:none;color:#8A6572;
+}
 .pull-hint.hide{opacity:0}
 .pull-hint.gone{display:none}
 
 .reveal-date{
-  margin:clamp(6px,2vw,10px) 0 0;
-  font-size:clamp(28px,10vw,44px);
-  font-weight:800;
-  color:var(--green);
-  letter-spacing:.04em;
+  margin:clamp(10px,3vw,18px) 0 0;
+  font-family:var(--serif);font-weight:600;
+  font-size:clamp(32px,11vw,48px);
+  color:#3D272E;letter-spacing:.06em;direction:ltr;
+  text-shadow:0 1px 0 rgba(255,255,255,.8);
   opacity:0;transform:translateY(10px) scale(.9);
   transition:opacity .5s ease,transform .6s cubic-bezier(.34,1.56,.64,1);
-  direction:ltr;
 }
 .reveal-date.show{opacity:1;transform:none}
 
 .cta{
-  margin-top:clamp(10px,3vw,18px);
-  border:var(--line) solid var(--green-deep);
-  background:var(--green-deep);
-  color:#fff;
-  border-radius:999px;
-  padding:14px 30px;
-  font-size:15px;font-weight:700;letter-spacing:.12em;
+  margin-top:clamp(12px,3.5vw,20px);
+  border:0;border-radius:999px;
+  padding:15px 32px;
+  font-family:var(--font);
+  font-size:15px;font-weight:600;letter-spacing:.14em;
+  color:#FFF6F4;
+  background:linear-gradient(180deg,#6E4351 0%,#54303C 100%);
+  box-shadow:0 10px 18px -8px rgba(84,48,60,.75),inset 0 1px 0 rgba(255,255,255,.35);
   opacity:0;transform:translateY(8px);pointer-events:none;
-  transition:opacity .5s ease .15s,transform .5s ease .15s,background .2s;
+  transition:opacity .5s ease .15s,transform .5s ease .15s;
 }
 .cta.show{opacity:1;transform:none;pointer-events:auto}
-.cta.ghost{background:transparent;color:var(--green-deep)}
 .cta:active{transform:scale(.97)}
-
 /* ---------- קונפטי ---------- */
 #confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
 #confetti span{
@@ -293,74 +442,73 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- ========================= מסך 1 — מכונת המזל ========================= -->
 <section id="stage-slot">
-  <p class="eyebrow">Together with their families</p>
-  <h1 class="save-title">Save the Date</h1>
-  <p class="save-sub">שחף <span style="color:var(--green)">&#9825;</span> תומר</p>
+  <p class="eyebrow" dir="ltr">Together with their families</p>
+  <h1 class="save-title" dir="ltr">Save the Date</h1>
+  <p class="save-sub" dir="ltr">Shachaf <b>&#9825;</b> Tomer</p>
 
   <div class="machine-wrap armed" id="machine">
-    <svg class="machine-svg" viewBox="0 0 300 430" aria-hidden="true">
-      <defs>
-        <path id="arcPath" d="M62,112 A92,92 0 0 1 238,112"/>
-      </defs>
 
-      <!-- גוף המכונה -->
-      <path class="m-line" d="M52,412 V118 C52,52 96,20 150,20 C204,20 248,52 248,118 V412"/>
-      <!-- בסיס -->
-      <path class="m-line" d="M34,412 H266 a10,10 0 0 1 10,10 v6 H24 v-6 a10,10 0 0 1 10,-10 Z"/>
+    <!-- הבסיס (מאחורי הגוף) -->
+    <div class="base"></div>
 
-      <!-- כותרת מקושתת -->
-      <text class="m-arc-text"><textPath href="#arcPath" startOffset="50%" text-anchor="middle">SAVE THE DATE</textPath></text>
+    <!-- גוף המכונה -->
+    <div class="cabinet"></div>
 
-      <!-- נורות -->
-      <circle class="bulb" cx="102" cy="120" r="6.5"/>
-      <circle class="bulb" cx="126" cy="114" r="6.5"/>
-      <circle class="bulb" cx="150" cy="112" r="6.5"/>
-      <circle class="bulb" cx="174" cy="114" r="6.5"/>
-      <circle class="bulb" cx="198" cy="120" r="6.5"/>
-
-      <!-- פס עליון -->
-      <rect class="m-thin m-fill-soft" x="72" y="136" width="156" height="20" rx="8"/>
-      <circle cx="92" cy="146" r="3.4" fill="#C4703F"/>
-      <circle cx="112" cy="146" r="3.4" fill="#8FAE83"/>
-      <circle cx="132" cy="146" r="3.4" fill="#C4703F"/>
-      <circle cx="152" cy="146" r="3.4" fill="#8FAE83"/>
-      <circle cx="172" cy="146" r="3.4" fill="#C4703F"/>
-
-      <!-- מסגרת חלון הגלגלים -->
-      <rect class="m-line" x="66" y="160" width="168" height="90" rx="10" fill="#fff"/>
-
-      <!-- כפתורים -->
-      <rect class="m-thin" x="92" y="266" width="30" height="13" rx="6"/>
-      <rect class="m-thin" x="134" y="266" width="30" height="13" rx="6"/>
-      <rect class="m-thin" x="176" y="266" width="30" height="13" rx="6"/>
-      <rect class="m-thin m-fill-soft" x="112" y="292" width="76" height="12" rx="6"/>
-
-      <!-- מגש -->
-      <rect class="m-line" x="76" y="322" width="148" height="66" rx="22" fill="rgba(143,174,131,.10)"/>
-      <circle class="m-thin" cx="150" cy="350" r="15" fill="#fff"/>
-      <path class="m-thin" d="M143,352 c3,-9 11,-9 14,0" />
-
-      <!-- ידית -->
-      <g id="lever">
-        <path class="m-line" d="M250,208 L288,176"/>
-        <circle class="knob" cx="291" cy="172" r="10"/>
+    <!-- כותרת מוטבעת בקשת -->
+    <svg class="marquee" viewBox="0 0 244 200" aria-hidden="true">
+      <defs><path id="arcPath" d="M17,170 A105,105 0 0 1 227,170"/></defs>
+      <g transform="translate(0,1.6)">
+        <text class="mq" fill="rgba(134,70,94,.5)"><textPath href="#arcPath" startOffset="50%" text-anchor="middle">SAVE THE DATE</textPath></text>
       </g>
-      <circle class="m-thin" cx="250" cy="208" r="7" fill="#fff"/>
+      <g transform="translate(0,-1.2)">
+        <text class="mq" fill="rgba(255,255,255,.9)"><textPath href="#arcPath" startOffset="50%" text-anchor="middle">SAVE THE DATE</textPath></text>
+      </g>
+      <text class="mq" fill="#EDC4D2"><textPath href="#arcPath" startOffset="50%" text-anchor="middle">SAVE THE DATE</textPath></text>
     </svg>
 
-    <!-- הגלגלים -->
-    <div class="window" id="window">
-      <div class="reel"><div class="strip" id="s0"></div></div>
-      <div class="reel"><div class="strip" id="s1"></div></div>
-      <div class="reel"><div class="strip" id="s2"></div></div>
+    <!-- נורות -->
+    <div class="bulbs">
+      <span class="bulb" style="left:21.9%;top:26.2%"></span>
+      <span class="bulb" style="left:35.6%;top:23.1%"></span>
+      <span class="bulb" style="left:50%;top:22%"></span>
+      <span class="bulb" style="left:64.4%;top:23.1%"></span>
+      <span class="bulb" style="left:78.1%;top:26.2%"></span>
     </div>
 
-    <!-- שכבת לחיצה על כל המכונה -->
+    <!-- פס תאורה -->
+    <div class="lightbar"><i></i><i></i><i></i><i></i><i></i></div>
+
+    <!-- מסך הגלגלים -->
+    <div class="screen">
+      <div class="window" id="window">
+        <div class="reel"><div class="strip" id="s0"></div></div>
+        <div class="reel"><div class="strip" id="s1"></div></div>
+        <div class="reel"><div class="strip" id="s2"></div></div>
+      </div>
+    </div>
+
+    <!-- כפתורים, חריץ ומגש -->
+    <div class="btnrow"><i></i><i></i><i></i></div>
+    <div class="coinslot"></div>
+    <div class="tray"><i></i></div>
+
+    <!-- ידית -->
+    <div class="mount"></div>
+    <div class="lever">
+      <div class="rod"></div>
+      <div class="ball"></div>
+    </div>
+
+    <!-- שכבת לחיצה -->
     <button id="pullBtn" aria-label="משכו את הידית לגילוי התאריך"
-      style="position:absolute;inset:-6% -12% -2% -6%;background:none;border:0;padding:0"></button>
+      style="position:absolute;inset:-4% -14% -2% -6%;background:none;border:0;padding:0"></button>
   </div>
 
-  <p class="pull-hint" id="hint">משכו בידית לגילוי התאריך<small>הזמנה רשמית בהמשך</small></p>
+  <p class="pull-hint" id="hint" dir="ltr">
+    Pull the lever to reveal
+    <small>Formal invitation to follow</small>
+    <span class="he" dir="rtl">משכו בידית לגילוי התאריך</span>
+  </p>
   <p class="reveal-date" id="revealDate">28.10.26</p>
   <button class="cta" id="openInvite">לפתיחת ההזמנה</button>
 </section>
@@ -611,6 +759,8 @@ function spin(){
   spinning = true;
   machine.classList.remove('armed');
   machine.classList.add('pulled');
+  machine.classList.add('shaking');
+  setTimeout(() => machine.classList.remove('shaking'), 600);
   hint.classList.add('hide');
 
   // הידית חוזרת למקומה
@@ -619,11 +769,14 @@ function spin(){
   const durations = [1900, 2600, 3300];
   CONFIG.reels.forEach((_, r) => {
     const strip = document.getElementById('s' + r);
+    strip.classList.add('spin');
     strip.style.transition = 'transform ' + durations[r] + 'ms cubic-bezier(.12,.72,.16,1)';
     // דילוג ל־0 ואז לסיבוב מלא, כדי שייראה כמו כמה סיבובים
     requestAnimationFrame(() => {
       strip.style.transform = 'translateY(-' + (FINAL * 100) + '%)';
     });
+    // הטשטוש נעלם רגע לפני שהגלגל נעצר
+    setTimeout(() => strip.classList.remove('spin'), durations[r] - 320);
   });
 
   setTimeout(finish, durations[durations.length - 1] + 250);
@@ -653,7 +806,9 @@ machine.addEventListener('pointerup',   e => {
 /* ---------- קונפטי ---------- */
 function confetti(n){
   const host = document.getElementById('confetti');
-  const colors = ['#8FAE83','#2E4633','#C4703F','#F2E7D8','#1A1A1A'];
+  const colors = inviteStage.classList.contains('visible')
+    ? ['#8FAE83','#2E4633','#C4703F','#F2E7D8','#1A1A1A']
+    : ['#E9B7C6','#CE8FA1','#E0B08C','#FBEAF0','#8E5C6B'];
   for (let i = 0; i < n; i++){
     const s = document.createElement('span');
     s.style.left = Math.random() * 100 + 'vw';
