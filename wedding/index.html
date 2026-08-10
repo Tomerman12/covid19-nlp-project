@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>שחף ותומר · Save the Date</title>
+<meta name="theme-color" content="#FBFAF6">
+<meta name="description" content="שחף ותומר מתחתנים · 28.10.26 · משכו את הידית לגילוי התאריך">
+<meta property="og:title" content="שחף ותומר מתחתנים!">
+<meta property="og:description" content="משכו את הידית וגלו את התאריך ✨">
+<style>
+/* ============================================================
+   SHACHAF & TOMER — Save the Date + Invitation
+   קובץ אחד, בלי תלויות חיצוניות. כל הפרטים לעריכה ב-CONFIG למטה.
+   ============================================================ */
+
+:root{
+  --cream:#FBFAF6;
+  --paper:#FFFFFF;
+  --ink:#1A1A1A;
+  --ink-soft:#4A4A4A;
+  --green:#8FAE83;
+  --green-deep:#2E4633;
+  --terra:#C4703F;
+  --line:2.4px;
+  --maxw:520px;
+  --font: "Segoe UI", -apple-system, BlinkMacSystemFont, "Noto Sans Hebrew", "Arial Hebrew", Arial, sans-serif;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:var(--font);
+  overflow-x:hidden;
+  min-height:100svh;
+}
+img,svg{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- מסך 1: מכונת המזל ---------- */
+#stage-slot{
+  min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,3vw,20px);
+  padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 28px);
+  text-align:center;
+  position:relative;
+  transition:opacity .7s ease, transform .7s ease;
+}
+#stage-slot.gone{opacity:0;transform:scale(.96);pointer-events:none}
+
+.eyebrow{
+  font-size:clamp(9px,2.7vw,11px);
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin:0 0 2px;
+  padding-inline-start:.42em;
+}
+.save-title{
+  margin:0;
+  font-size:clamp(30px,9.5vw,46px);
+  font-weight:800;
+  letter-spacing:.01em;
+  color:var(--green-deep);
+  line-height:1.05;
+}
+.save-sub{
+  margin:6px 0 0;
+  font-size:clamp(13px,4vw,16px);
+  letter-spacing:.24em;
+  color:var(--ink);
+  padding-inline-start:.24em;
+}
+
+/* המכונה */
+.machine-wrap{
+  position:relative;
+  width:min(78vw,300px);
+  aspect-ratio:300/430;
+  margin:clamp(4px,2vw,14px) auto 0;
+  touch-action:manipulation;
+}
+.machine-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.m-line{fill:none;stroke:var(--green-deep);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.m-thin{fill:none;stroke:var(--green-deep);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.m-fill-soft{fill:rgba(143,174,131,.14)}
+.m-arc-text{font-size:19px;font-weight:800;letter-spacing:2.2px;fill:var(--green-deep)}
+
+.bulb{fill:#fff;stroke:var(--green-deep);stroke-width:2.2}
+.machine-wrap.lit .bulb{animation:bulbPop .7s ease-in-out infinite alternate}
+.machine-wrap.lit .bulb:nth-of-type(even){animation-delay:.35s}
+@keyframes bulbPop{from{fill:#fff}to{fill:var(--terra)}}
+
+/* ידית */
+#lever{cursor:grab;transform-origin:250px 208px;transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+#lever:active{cursor:grabbing}
+.machine-wrap.pulled #lever{transform:rotate(58deg)}
+.machine-wrap.armed #lever{animation:leverHint 2.6s ease-in-out infinite}
+@keyframes leverHint{0%,72%,100%{transform:rotate(0)}82%{transform:rotate(13deg)}}
+.knob{fill:var(--terra);stroke:var(--green-deep);stroke-width:2.2}
+
+/* חלון הגלגלים */
+.window{
+  position:absolute;
+  direction:ltr;
+  left:23.4%; top:38.2%; width:53.2%; height:19.6%;
+  display:flex; gap:2.5%;
+  padding:2.5%;
+  overflow:hidden;
+  border-radius:4px;
+}
+.reel{
+  position:relative;flex:1;overflow:hidden;
+  background:#fff;
+  border:2px solid var(--green-deep);
+  border-radius:3px;
+}
+.strip{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  transform:translateY(0);
+  will-change:transform;
+}
+.strip i{
+  flex:0 0 100%;
+  display:flex;align-items:center;justify-content:center;
+  font-style:normal;font-weight:800;
+  font-size:clamp(15px,5.6vw,24px);
+  color:var(--green-deep);
+  letter-spacing:.02em;
+}
+.strip i.h{color:var(--green);font-size:clamp(16px,6vw,26px)}
+.reel::after{ /* הצללה עדינה בקצוות החלון */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,0) 26%,rgba(0,0,0,0) 74%,rgba(0,0,0,.10));
+}
+
+/* טקסט מתחת למכונה */
+.pull-hint{
+  margin:clamp(8px,3vw,16px) 0 0;
+  font-size:clamp(12px,3.6vw,15px);
+  letter-spacing:.2em;
+  color:var(--ink);
+  padding-inline-start:.2em;
+  transition:opacity .4s ease;
+}
+.pull-hint small{display:block;margin-top:8px;font-size:.72em;letter-spacing:.16em;color:var(--ink-soft)}
+.pull-hint.hide{opacity:0}
+.pull-hint.gone{display:none}
+
+.reveal-date{
+  margin:clamp(6px,2vw,10px) 0 0;
+  font-size:clamp(28px,10vw,44px);
+  font-weight:800;
+  color:var(--green);
+  letter-spacing:.04em;
+  opacity:0;transform:translateY(10px) scale(.9);
+  transition:opacity .5s ease,transform .6s cubic-bezier(.34,1.56,.64,1);
+  direction:ltr;
+}
+.reveal-date.show{opacity:1;transform:none}
+
+.cta{
+  margin-top:clamp(10px,3vw,18px);
+  border:var(--line) solid var(--green-deep);
+  background:var(--green-deep);
+  color:#fff;
+  border-radius:999px;
+  padding:14px 30px;
+  font-size:15px;font-weight:700;letter-spacing:.12em;
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .5s ease .15s,transform .5s ease .15s,background .2s;
+}
+.cta.show{opacity:1;transform:none;pointer-events:auto}
+.cta.ghost{background:transparent;color:var(--green-deep)}
+.cta:active{transform:scale(.97)}
+
+/* ---------- קונפטי ---------- */
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
+#confetti span{
+  position:absolute;top:-14vh;width:9px;height:14px;border-radius:2px;opacity:.95;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(118vh) rotate(760deg);opacity:.9}
+}
+
+/* ---------- מסך 2: ההזמנה ---------- */
+#stage-invite{
+  display:none;
+  opacity:0;
+  transition:opacity .8s ease;
+  padding:0 0 calc(env(safe-area-inset-bottom) + 60px);
+}
+#stage-invite.on{display:block}
+#stage-invite.visible{opacity:1}
+
+.sheet{
+  max-width:var(--maxw);
+  margin:0 auto;
+  background:var(--paper);
+  min-height:100svh;
+  padding:clamp(22px,6vw,34px) clamp(18px,5vw,28px) 10px;
+  box-shadow:0 0 60px rgba(46,70,51,.08);
+}
+
+.hero{position:relative;text-align:center}
+.hero-title{
+  margin:0;
+  font-size:clamp(26px,8.5vw,40px);
+  font-weight:800;
+  color:var(--green);
+  letter-spacing:.02em;
+  line-height:1.1;
+}
+.hero-title span{display:block;color:var(--green-deep);font-size:.52em;letter-spacing:.3em;margin-top:10px;padding-inline-start:.3em}
+.couple-art{width:100%;margin:clamp(6px,2vw,14px) auto 0}
+.names{
+  margin:6px 0 0;
+  font-size:clamp(24px,7.6vw,34px);
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.big-date{
+  margin:6px 0 0;
+  font-size:clamp(22px,7vw,30px);
+  font-weight:700;color:var(--green);
+  letter-spacing:.08em;direction:ltr;
+}
+.day-line{margin:6px 0 0;font-size:14px;color:var(--ink-soft);letter-spacing:.12em}
+.tagline{margin:14px 0 0;font-size:clamp(14px,4.4vw,17px);color:var(--green-deep)}
+
+.rule{display:flex;align-items:center;gap:12px;margin:clamp(22px,6vw,32px) 0}
+.rule::before,.rule::after{content:"";flex:1;height:2px;background:var(--green);opacity:.4;border-radius:2px}
+.rule svg{width:22px;height:22px;flex:none}
+
+.section-h{
+  margin:0 0 14px;text-align:center;
+  font-size:clamp(17px,5.4vw,22px);font-weight:800;color:var(--green-deep);
+  letter-spacing:.14em;padding-inline-start:.14em;
+}
+
+.cards{display:grid;gap:12px}
+.card{
+  border:var(--line) solid var(--ink);
+  border-radius:18px;
+  padding:16px 18px;
+  display:flex;align-items:center;gap:14px;
+  background:#fff;
+}
+.card .ico{flex:none;width:38px;height:38px}
+.card b{display:block;font-size:15px;letter-spacing:.08em}
+.card small{display:block;margin-top:3px;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+
+.countdown{display:flex;justify-content:center;gap:10px;margin:4px 0 0}
+.cd-box{
+  flex:1;max-width:96px;
+  border:var(--line) solid var(--green);
+  border-radius:14px;padding:12px 4px;text-align:center;
+}
+.cd-box b{display:block;font-size:clamp(20px,6vw,26px);font-weight:800;color:var(--green-deep);direction:ltr}
+.cd-box small{display:block;margin-top:2px;font-size:11.5px;letter-spacing:.1em;color:var(--ink-soft)}
+
+.actions{display:grid;gap:11px;margin-top:6px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  border:var(--line) solid var(--green-deep);
+  background:var(--green-deep);color:#fff;
+  text-decoration:none;border-radius:999px;
+  padding:15px 18px;font-size:15px;font-weight:700;letter-spacing:.08em;
+  transition:transform .15s ease,opacity .2s;
+}
+.btn.alt{background:#fff;color:var(--green-deep)}
+.btn:active{transform:scale(.98)}
+.btn svg{width:19px;height:19px;flex:none}
+
+.note{margin:18px 0 0;text-align:center;font-size:13px;color:var(--ink-soft);line-height:1.7}
+.signature{
+  margin:clamp(26px,7vw,38px) 0 8px;text-align:center;
+  font-size:clamp(16px,5vw,20px);font-weight:700;color:var(--green);letter-spacing:.06em;
+}
+.credit{text-align:center;font-size:11px;color:#9a9a9a;letter-spacing:.1em;margin:0 0 6px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s !important;transition-duration:.15s !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ========================= מסך 1 — מכונת המזל ========================= -->
+<section id="stage-slot">
+  <p class="eyebrow">Together with their families</p>
+  <h1 class="save-title">Save the Date</h1>
+  <p class="save-sub">שחף <span style="color:var(--green)">&#9825;</span> תומר</p>
+
+  <div class="machine-wrap armed" id="machine">
+    <svg class="machine-svg" viewBox="0 0 300 430" aria-hidden="true">
+      <defs>
+        <path id="arcPath" d="M62,112 A92,92 0 0 1 238,112"/>
+      </defs>
+
+      <!-- גוף המכונה -->
+      <path class="m-line" d="M52,412 V118 C52,52 96,20 150,20 C204,20 248,52 248,118 V412"/>
+      <!-- בסיס -->
+      <path class="m-line" d="M34,412 H266 a10,10 0 0 1 10,10 v6 H24 v-6 a10,10 0 0 1 10,-10 Z"/>
+
+      <!-- כותרת מקושתת -->
+      <text class="m-arc-text"><textPath href="#arcPath" startOffset="50%" text-anchor="middle">SAVE THE DATE</textPath></text>
+
+      <!-- נורות -->
+      <circle class="bulb" cx="102" cy="120" r="6.5"/>
+      <circle class="bulb" cx="126" cy="114" r="6.5"/>
+      <circle class="bulb" cx="150" cy="112" r="6.5"/>
+      <circle class="bulb" cx="174" cy="114" r="6.5"/>
+      <circle class="bulb" cx="198" cy="120" r="6.5"/>
+
+      <!-- פס עליון -->
+      <rect class="m-thin m-fill-soft" x="72" y="136" width="156" height="20" rx="8"/>
+      <circle cx="92" cy="146" r="3.4" fill="#C4703F"/>
+      <circle cx="112" cy="146" r="3.4" fill="#8FAE83"/>
+      <circle cx="132" cy="146" r="3.4" fill="#C4703F"/>
+      <circle cx="152" cy="146" r="3.4" fill="#8FAE83"/>
+      <circle cx="172" cy="146" r="3.4" fill="#C4703F"/>
+
+      <!-- מסגרת חלון הגלגלים -->
+      <rect class="m-line" x="66" y="160" width="168" height="90" rx="10" fill="#fff"/>
+
+      <!-- כפתורים -->
+      <rect class="m-thin" x="92" y="266" width="30" height="13" rx="6"/>
+      <rect class="m-thin" x="134" y="266" width="30" height="13" rx="6"/>
+      <rect class="m-thin" x="176" y="266" width="30" height="13" rx="6"/>
+      <rect class="m-thin m-fill-soft" x="112" y="292" width="76" height="12" rx="6"/>
+
+      <!-- מגש -->
+      <rect class="m-line" x="76" y="322" width="148" height="66" rx="22" fill="rgba(143,174,131,.10)"/>
+      <circle class="m-thin" cx="150" cy="350" r="15" fill="#fff"/>
+      <path class="m-thin" d="M143,352 c3,-9 11,-9 14,0" />
+
+      <!-- ידית -->
+      <g id="lever">
+        <path class="m-line" d="M250,208 L288,176"/>
+        <circle class="knob" cx="291" cy="172" r="10"/>
+      </g>
+      <circle class="m-thin" cx="250" cy="208" r="7" fill="#fff"/>
+    </svg>
+
+    <!-- הגלגלים -->
+    <div class="window" id="window">
+      <div class="reel"><div class="strip" id="s0"></div></div>
+      <div class="reel"><div class="strip" id="s1"></div></div>
+      <div class="reel"><div class="strip" id="s2"></div></div>
+    </div>
+
+    <!-- שכבת לחיצה על כל המכונה -->
+    <button id="pullBtn" aria-label="משכו את הידית לגילוי התאריך"
+      style="position:absolute;inset:-6% -12% -2% -6%;background:none;border:0;padding:0"></button>
+  </div>
+
+  <p class="pull-hint" id="hint">משכו בידית לגילוי התאריך<small>הזמנה רשמית בהמשך</small></p>
+  <p class="reveal-date" id="revealDate">28.10.26</p>
+  <button class="cta" id="openInvite">לפתיחת ההזמנה</button>
+</section>
+
+<div id="confetti"></div>
+
+<!-- ========================= מסך 2 — ההזמנה ========================= -->
+<section id="stage-invite">
+  <div class="sheet">
+
+    <header class="hero">
+      <h2 class="hero-title" dir="ltr">SAVE THE DATE!<span>WE'RE GETTING MARRIED</span></h2>
+
+      <!-- ====== איור קווי: זוג + כלב ====== -->
+      <svg class="couple-art" viewBox="0 0 420 520" role="img" aria-label="איור קווי של הזוג עם הכלב">
+        <g fill="none" stroke="#1A1A1A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+
+          <!-- ===== קישוטים ===== -->
+          <!-- כדור דיסקו -->
+          <g stroke="#2E4633" stroke-width="2.2">
+            <path d="M386,10 v14"/>
+            <circle cx="386" cy="48" r="24"/>
+            <path d="M362,48 h48 M386,24 v48"/>
+            <path d="M370,30 c10,12 10,24 0,36 M402,30 c-10,12 -10,24 0,36"/>
+            <path d="M366,38 h40 M366,58 h40"/>
+          </g>
+          <!-- כוס יין -->
+          <g stroke="#2E4633" stroke-width="2.2">
+            <path d="M18,86 h52 c0,32 -12,48 -26,48 c-14,0 -26,-16 -26,-48 Z" fill="#2E4633"/>
+            <path d="M44,134 v40"/>
+            <path d="M24,176 h40"/>
+          </g>
+          <!-- לב -->
+          <path d="M212,42 c-6,-10 -21,-6 -21,5 c0,10 13,16 21,24 c8,-8 21,-14 21,-24 c0,-11 -15,-15 -21,-5 Z" stroke="#2E4633"/>
+          <!-- ניצוצות -->
+          <g stroke="#2E4633" stroke-width="2.2">
+            <path d="M96,58 c2,10 5,13 14,15 c-9,2 -12,5 -14,15 c-2,-10 -5,-13 -14,-15 c9,-2 12,-5 14,-15 Z"/>
+            <path d="M320,40 c1,7 4,9 10,11 c-6,1 -9,4 -10,11 c-2,-7 -4,-9 -10,-11 c6,-2 8,-4 10,-11 Z"/>
+            <path d="M400,436 c2,9 5,12 13,14 c-8,2 -11,5 -13,14 c-2,-9 -5,-12 -13,-14 c8,-2 11,-5 13,-14 Z"/>
+            <path d="M40,430 c1,7 4,9 10,11 c-6,2 -9,4 -10,11 c-2,-7 -4,-9 -10,-11 c6,-2 8,-4 10,-11 Z"/>
+          </g>
+
+          <!-- ===== הכלה ===== -->
+          <!-- הינומה מאחור -->
+          <path d="M138,60 C106,88 82,216 88,344 C90,394 98,424 106,442" stroke-width="2.2"/>
+          <path d="M106,442 C114,446 122,444 128,438" stroke-width="2.2"/>
+          <!-- פנים -->
+          <path d="M125,112 C125,84 136,68 150,68 C164,68 175,84 175,112 C175,138 164,152 150,152 C136,152 125,138 125,112 Z"/>
+          <!-- שיער -->
+          <path d="M121,124 C116,80 130,52 152,52 C176,52 184,80 180,122 C177,98 168,86 150,86 C132,86 124,100 121,124 Z" fill="#fff"/>
+          <path d="M121,124 C118,148 121,168 127,182"/>
+          <path d="M180,122 C183,148 180,168 174,182"/>
+          <!-- משקפי שמש -->
+          <path d="M128,106 h44" stroke-width="2.2"/>
+          <rect x="129" y="102" width="18" height="13" rx="4" fill="#1A1A1A"/>
+          <rect x="153" y="102" width="18" height="13" rx="4" fill="#1A1A1A"/>
+          <path d="M147,108 h6"/>
+          <path d="M143,131 c4,5 11,5 15,-1" stroke-width="2.2"/>
+          <!-- צוואר -->
+          <path d="M142,152 v14 M162,152 v14"/>
+          <!-- שמלה -->
+          <path d="M124,178 C136,170 166,170 178,178"/>
+          <path d="M124,178 C121,202 123,220 128,236 C116,300 110,378 106,446"/>
+          <path d="M178,178 C181,202 179,220 174,236 C186,300 194,378 198,446"/>
+          <path d="M128,236 C146,244 158,244 174,236" stroke-width="2"/>
+          <path d="M106,446 C132,458 176,458 198,446"/>
+          <!-- זרוע אוחזת בזר -->
+          <path d="M128,184 C116,206 112,232 118,250 C122,258 130,260 136,254"/>
+          <!-- זר פרחים -->
+          <g stroke="#2E4633" stroke-width="2">
+            <path d="M122,270 c4,14 8,22 12,28 M134,266 c1,14 0,22 -1,30 M146,262 c-3,13 -8,22 -11,28"/>
+            <circle cx="118" cy="248" r="10" fill="rgba(143,174,131,.35)"/>
+            <circle cx="138" cy="241" r="9"  fill="#fff"/>
+            <circle cx="129" cy="263" r="10" fill="rgba(196,112,63,.30)"/>
+            <circle cx="149" cy="254" r="8"  fill="rgba(143,174,131,.35)"/>
+          </g>
+          <!-- זרוע לכיוון יד ביד -->
+          <path d="M178,184 C192,210 202,240 210,266"/>
+          <path d="M210,266 C203,278 206,294 218,300 C228,305 240,302 243,294 C245,288 242,282 236,282"/>
+
+          <!-- ===== החתן ===== -->
+          <!-- פנים -->
+          <path d="M246,104 C246,78 256,62 272,62 C288,62 298,78 298,104 C298,128 287,142 272,142 C257,142 246,128 246,104 Z"/>
+          <!-- שיער -->
+          <path d="M247,96 C244,66 256,50 273,50 C291,50 303,66 299,96 C295,80 287,72 273,72 C258,72 250,80 247,96 Z" fill="#fff"/>
+          <!-- משקפי שמש -->
+          <path d="M248,98 h48" stroke-width="2.2"/>
+          <rect x="249" y="94" width="19" height="13" rx="4" fill="#1A1A1A"/>
+          <rect x="275" y="94" width="19" height="13" rx="4" fill="#1A1A1A"/>
+          <path d="M268,100 h7"/>
+          <path d="M264,122 c5,5 12,5 16,-1" stroke-width="2.2"/>
+          <!-- צוואר -->
+          <path d="M262,142 v14 M284,142 v14"/>
+          <!-- חליפה: שרוול שמאל -->
+          <path d="M258,158 C242,162 231,172 229,192 C226,228 224,264 224,296"/>
+          <path d="M224,296 C231,303 241,303 247,296"/>
+          <path d="M247,296 C249,262 250,228 251,206"/>
+          <!-- חליפה: שרוול ימין -->
+          <path d="M286,158 C302,162 313,172 315,192 C318,228 320,264 320,296"/>
+          <path d="M320,296 C314,303 304,303 298,296"/>
+          <path d="M298,296 C296,262 295,228 293,206"/>
+          <!-- דשים ועניבה -->
+          <path d="M258,158 L272,192 L286,158"/>
+          <path d="M272,192 V292"/>
+          <path d="M266,164 h12 l-3,10 h-6 Z" fill="#C4703F" stroke="#C4703F"/>
+          <path d="M269,176 h6 l4,24 l-7,9 l-7,-9 Z" fill="#C4703F" stroke="#C4703F"/>
+          <!-- גוף המקטורן -->
+          <path d="M251,206 C247,244 245,278 243,310"/>
+          <path d="M293,206 C297,244 299,278 301,310"/>
+          <path d="M243,310 C258,318 288,318 301,310"/>
+          <!-- מכנסיים -->
+          <path d="M244,314 C245,360 246,410 246,458"/>
+          <path d="M300,314 C299,360 298,410 298,458"/>
+          <path d="M272,318 V458"/>
+          <!-- נעליים -->
+          <path d="M246,458 C242,468 236,472 238,476 C248,480 262,478 266,474 C267,468 267,462 266,458"/>
+          <path d="M298,458 C302,468 308,472 306,476 C296,480 282,478 278,474 C277,468 277,462 278,458"/>
+          <!-- יד שלובה עם הכלה -->
+          <!-- יד ימין בכיס -->
+          <path d="M303,301 C297,307 296,316 303,319 C310,322 316,314 314,304"/>
+
+          <!-- ===== הכלב ===== -->
+          <!-- אוזניים -->
+          <path d="M341,352 C329,356 324,376 330,390 C334,397 341,393 342,384"/>
+          <path d="M375,350 C387,354 392,374 386,388 C382,395 375,391 374,382"/>
+          <!-- ראש -->
+          <path d="M332,376 C331,358 343,346 358,346 C373,346 383,357 383,372 C383,389 370,399 356,398 C345,397 337,389 334,380"/>
+          <!-- חוטם -->
+          <path d="M336,374 C322,369 311,375 312,384 C313,394 326,397 336,391"/>
+          <circle cx="315" cy="378" r="2.8" fill="#1A1A1A" stroke="none"/>
+          <path d="M328,394 C326,402 330,408 336,406" stroke="#C4703F"/>
+          <path d="M348,366 c3,-4 8,-4 11,0" stroke-width="2.4"/>
+          <!-- גוף יושב -->
+          <path d="M337,396 C332,412 330,438 332,460"/>
+          <path d="M379,384 C391,400 399,428 395,462"/>
+          <path d="M332,460 C348,470 380,470 395,462"/>
+          <path d="M341,424 C337,440 337,452 339,461 C343,465 349,464 350,460"/>
+          <path d="M360,430 C358,444 358,454 360,463 C364,467 370,466 371,462"/>
+          <path d="M340,400 C349,408 363,408 371,400" stroke="#C4703F" stroke-width="2.4"/>
+          <!-- זנב -->
+          <path d="M396,448 C408,444 414,434 409,428 C405,424 399,427 397,432"/>
+        </g>
+      </svg>
+
+      <p class="names" id="namesLine">שחף &amp; תומר</p>
+      <p class="big-date" id="dateLine">28.10.26</p>
+      <p class="day-line" id="dayLine"></p>
+      <p class="tagline">מתרגשים להתחתן — ושמחים לחגוג איתכם!</p>
+    </header>
+
+    <div class="rule"><svg viewBox="0 0 24 24" fill="none" stroke="#8FAE83" stroke-width="2.2" stroke-linecap="round"><path d="M12 20 C5 14 2 10 4.5 6.5 C7 3 11 5 12 8 C13 5 17 3 19.5 6.5 C22 10 19 14 12 20 Z"/></svg></div>
+
+    <h3 class="section-h">הספירה לאחור</h3>
+    <div class="countdown" id="countdown">
+      <div class="cd-box"><b id="cdD">–</b><small>ימים</small></div>
+      <div class="cd-box"><b id="cdH">–</b><small>שעות</small></div>
+      <div class="cd-box"><b id="cdM">–</b><small>דקות</small></div>
+    </div>
+
+    <div class="rule"><svg viewBox="0 0 24 24" fill="none" stroke="#8FAE83" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></div>
+
+    <h3 class="section-h">פרטי האירוע</h3>
+    <div class="cards">
+      <div class="card">
+        <svg class="ico" viewBox="0 0 40 40" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="9" width="28" height="25" rx="5"/><path d="M6 17h28M14 5v8M26 5v8"/></svg>
+        <div><b id="cardDate">יום רביעי, 28 באוקטובר 2026</b><small>רביעי בערב · מסמנים ביומן ✨</small></div>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 40 40" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round"><circle cx="20" cy="20" r="14"/><path d="M20 11v10l7 4"/></svg>
+        <div><b>קבלת פנים <span id="tRec">19:00</span></b><small>חופה <span id="tChu">20:00</span> · ואז רוקדים עד הסוף</small></div>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 40 40" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round"><path d="M20 35s11-11 11-19a11 11 0 1 0-22 0c0 8 11 19 11 19Z"/><circle cx="20" cy="16" r="4"/></svg>
+        <div><b id="venueName">שם האולם</b><small id="venueAddr">רחוב וכתובת, עיר</small></div>
+      </div>
+    </div>
+
+    <div class="actions" style="margin-top:14px">
+      <a class="btn" id="rsvpBtn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-3.2-6.4"/><path d="M9 12l2.5 2.5L20 6"/></svg>
+        אישור הגעה
+      </a>
+      <a class="btn alt" id="navBtn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.6"/></svg>
+        ניווט לאולם
+      </a>
+      <a class="btn alt" id="calBtn" href="#" download="shachaf-tomer.ics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5 12 18l2.5-2.5"/></svg>
+        הוספה ליומן
+      </a>
+      <button class="btn alt" id="shareBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.7 15.4 6.4M8.6 13.3l6.8 4.3"/></svg>
+        שיתוף ההזמנה
+      </button>
+    </div>
+
+    <p class="note" id="rsvpNote">נא לאשר הגעה עד 1.10.2026 · אפשר גם להשיב בהודעה</p>
+
+    <div class="rule"><svg viewBox="0 0 24 24" fill="none" stroke="#8FAE83" stroke-width="2.2" stroke-linecap="round"><path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2.2"/><circle cx="17" cy="16" r="2.2"/></svg></div>
+
+    <p class="signature">מחכים לראותכם על רחבת הריקודים ✨</p>
+    <p class="credit">SHACHAF &amp; TOMER · 28.10.26</p>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   ✏️  כל מה שצריך לערוך נמצא כאן:
+   ============================================================ */
+const CONFIG = {
+  bride:      'שחף',
+  groom:      'תומר',
+  dateLabel:  '28.10.26',            // התאריך שמופיע על הגלגלים ובהזמנה
+  reels:      ['28','10','26'],      // מה נעצר בכל גלגל
+  isoDate:    '2026-10-28',          // YYYY-MM-DD
+  reception:  '19:00',               // קבלת פנים
+  chuppah:    '20:00',               // חופה
+  venueName:  'שם האולם',
+  venueAddr:  'רחוב וכתובת, עיר',
+  wazeQuery:  'שם האולם',            // מה לחפש ב-Waze
+  rsvpPhone:  '972500000000',        // מספר לאישור הגעה (וואטסאפ, בלי +)
+  rsvpBy:     '1.10.2026'
+};
+
+/* ---------- מסך 1: מכונת המזל ---------- */
+const machine   = document.getElementById('machine');
+const pullBtn   = document.getElementById('pullBtn');
+const hint      = document.getElementById('hint');
+const revealEl  = document.getElementById('revealDate');
+const openBtn   = document.getElementById('openInvite');
+const ITEMS     = 16;                 // מספר הפריטים ברצועה
+const FINAL     = ITEMS - 1;          // מיקום המספר הסופי
+let spinning = false, done = false;
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+// בניית שלוש הרצועות: לב בהתחלה, מספרים אקראיים, ובסוף התאריך
+CONFIG.reels.forEach((target, r) => {
+  const strip = document.getElementById('s' + r);
+  let html = '<i class="h">&#9825;</i>';
+  for (let i = 1; i < FINAL; i++) html += '<i>' + pad(Math.floor(Math.random()*31)+1) + '</i>';
+  html += '<i>' + target + '</i>';
+  strip.innerHTML = html;
+});
+
+function spin(){
+  if (spinning || done) return;
+  spinning = true;
+  machine.classList.remove('armed');
+  machine.classList.add('pulled');
+  hint.classList.add('hide');
+
+  // הידית חוזרת למקומה
+  setTimeout(() => machine.classList.remove('pulled'), 520);
+
+  const durations = [1900, 2600, 3300];
+  CONFIG.reels.forEach((_, r) => {
+    const strip = document.getElementById('s' + r);
+    strip.style.transition = 'transform ' + durations[r] + 'ms cubic-bezier(.12,.72,.16,1)';
+    // דילוג ל־0 ואז לסיבוב מלא, כדי שייראה כמו כמה סיבובים
+    requestAnimationFrame(() => {
+      strip.style.transform = 'translateY(-' + (FINAL * 100) + '%)';
+    });
+  });
+
+  setTimeout(finish, durations[durations.length - 1] + 250);
+}
+
+function finish(){
+  done = true;
+  machine.classList.add('lit');
+  hint.classList.add('gone');
+  revealEl.textContent = CONFIG.dateLabel;
+  revealEl.classList.add('show');
+  openBtn.classList.add('show');
+  confetti(80);
+  if (navigator.vibrate) { try { navigator.vibrate([18, 60, 18]); } catch(e){} }
+}
+
+pullBtn.addEventListener('click', spin);
+
+// גם גרירה של הידית כלפי מטה מפעילה
+let dragY = null;
+machine.addEventListener('pointerdown', e => { dragY = e.clientY; }, {passive:true});
+machine.addEventListener('pointerup',   e => {
+  if (dragY !== null && e.clientY - dragY > 24) spin();
+  dragY = null;
+}, {passive:true});
+
+/* ---------- קונפטי ---------- */
+function confetti(n){
+  const host = document.getElementById('confetti');
+  const colors = ['#8FAE83','#2E4633','#C4703F','#F2E7D8','#1A1A1A'];
+  for (let i = 0; i < n; i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.background = colors[i % colors.length];
+    s.style.animationDuration = (2.6 + Math.random() * 2.2) + 's';
+    s.style.animationDelay = (Math.random() * .7) + 's';
+    s.style.transform = 'rotate(' + (Math.random()*360) + 'deg)';
+    if (i % 3 === 0) s.style.borderRadius = '50%';
+    host.appendChild(s);
+    setTimeout(() => s.remove(), 6000);
+  }
+}
+
+/* ---------- מעבר להזמנה ---------- */
+const slotStage   = document.getElementById('stage-slot');
+const inviteStage = document.getElementById('stage-invite');
+
+openBtn.addEventListener('click', () => {
+  slotStage.classList.add('gone');
+  inviteStage.classList.add('on');
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => requestAnimationFrame(() => inviteStage.classList.add('visible')));
+  setTimeout(() => { slotStage.style.display = 'none'; confetti(40); }, 750);
+});
+
+/* ---------- מילוי פרטי ההזמנה ---------- */
+const D = CONFIG;
+const eventStart = new Date(D.isoDate + 'T' + D.reception + ':00');
+const eventEnd   = new Date(eventStart.getTime() + 6 * 3600 * 1000);
+
+document.getElementById('namesLine').textContent = D.bride + ' & ' + D.groom;
+document.getElementById('dateLine').textContent  = D.dateLabel;
+document.getElementById('tRec').textContent      = D.reception;
+document.getElementById('tChu').textContent      = D.chuppah;
+document.getElementById('venueName').textContent = D.venueName;
+document.getElementById('venueAddr').textContent = D.venueAddr;
+document.getElementById('rsvpNote').textContent  = 'נא לאשר הגעה עד ' + D.rsvpBy + ' · אפשר גם להשיב בהודעה';
+document.title = D.bride + ' ו' + D.groom + ' · ' + D.dateLabel;
+
+const heDate = eventStart.toLocaleDateString('he-IL', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+document.getElementById('cardDate').textContent = heDate;
+document.getElementById('dayLine').textContent  = heDate;
+
+// אישור הגעה בוואטסאפ
+const rsvpText = encodeURIComponent('היי ' + D.bride + ' ו' + D.groom + '! מאשר/ת הגעה לחתונה ב-' + D.dateLabel + ' 🎉');
+document.getElementById('rsvpBtn').href = 'https://wa.me/' + D.rsvpPhone + '?text=' + rsvpText;
+
+// ניווט
+document.getElementById('navBtn').href = 'https://waze.com/ul?q=' + encodeURIComponent(D.wazeQuery);
+
+// קובץ יומן (ics) שנוצר בדפדפן
+function icsStamp(d){ return d.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z'; }
+const ics = [
+  'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//wedding//invite//HE','CALSCALE:GREGORIAN',
+  'BEGIN:VEVENT',
+  'UID:' + Date.now() + '@wedding',
+  'DTSTAMP:' + icsStamp(new Date()),
+  'DTSTART:' + icsStamp(eventStart),
+  'DTEND:'   + icsStamp(eventEnd),
+  'SUMMARY:החתונה של ' + D.bride + ' ו' + D.groom,
+  'LOCATION:' + D.venueName + ', ' + D.venueAddr,
+  'DESCRIPTION:קבלת פנים ' + D.reception + ' · חופה ' + D.chuppah,
+  'END:VEVENT','END:VCALENDAR'
+].join('\r\n');
+document.getElementById('calBtn').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+
+// שיתוף
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const data = {
+    title: D.bride + ' ו' + D.groom + ' מתחתנים!',
+    text: 'שמרו את התאריך — ' + D.dateLabel + ' ✨',
+    url: location.href
+  };
+  try {
+    if (navigator.share) await navigator.share(data);
+    else { await navigator.clipboard.writeText(location.href); alert('הקישור הועתק ✨'); }
+  } catch(e){ /* המשתמש ביטל */ }
+});
+
+// ספירה לאחור
+function tick(){
+  const diff = eventStart - new Date();
+  if (diff <= 0){
+    document.getElementById('countdown').innerHTML =
+      '<div class="cd-box" style="max-width:none;flex:1"><b>מזל טוב!</b><small>היום חוגגים</small></div>';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor(diff / 3600000) % 24;
+  const m = Math.floor(diff / 60000) % 60;
+  document.getElementById('cdD').textContent = d;
+  document.getElementById('cdH').textContent = pad(h);
+  document.getElementById('cdM').textContent = pad(m);
+}
+tick();
+setInterval(tick, 30000);
+</script>
+</body>
+</html>
