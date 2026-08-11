@@ -51,6 +51,10 @@ button{font-family:inherit;cursor:pointer}
   transition:opacity .7s ease, transform .7s ease;
 }
 #stage-slot.gone{opacity:0;transform:scale(.96);pointer-events:none}
+#stage-slot::before{ /* ויניית עדינה — נותן תחושה של צילום ולא של איור */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(115% 75% at 50% 38%,rgba(0,0,0,0) 46%,rgba(96,52,74,.09) 76%,rgba(84,44,66,.19) 100%);
+}
 
 .eyebrow{
   font-family:var(--serif);
@@ -77,19 +81,28 @@ button{font-family:inherit;cursor:pointer}
   aspect-ratio:278/450;
   margin:clamp(12px,3.5vw,24px) auto 0;
   touch-action:manipulation;
+  transform:perspective(1500px) rotateY(-5deg) rotateX(1.2deg);
 }
 .machine-wrap::after{ /* צל מגע ברצפה */
-  content:"";position:absolute;left:4%;bottom:-2.5%;width:92%;height:5%;
+  content:"";position:absolute;left:1%;bottom:-3.5%;width:98%;height:7%;
   border-radius:50%;
-  background:radial-gradient(closest-side,rgba(122,62,84,.42),rgba(122,62,84,0) 100%);
-  filter:blur(4px);
+  background:radial-gradient(closest-side,rgba(104,46,70,.52) 0%,rgba(104,46,70,.26) 46%,rgba(104,46,70,0) 100%);
+  filter:blur(6px);
 }
 .machine-wrap.shaking{animation:machineShake .55s cubic-bezier(.36,.07,.19,.97)}
 @keyframes machineShake{
-  0%,100%{transform:translateX(0)}
-  20%{transform:translateX(-2px) rotate(-.35deg)}
-  45%{transform:translateX(2.5px) rotate(.35deg)}
-  70%{transform:translateX(-1.5px) rotate(-.2deg)}
+  0%,100%{transform:perspective(1500px) rotateY(-5deg) rotateX(1.2deg) translateX(0)}
+  20%{transform:perspective(1500px) rotateY(-5deg) rotateX(1.2deg) translateX(-2px) rotate(-.35deg)}
+  45%{transform:perspective(1500px) rotateY(-5deg) rotateX(1.2deg) translateX(2.5px) rotate(.35deg)}
+  70%{transform:perspective(1500px) rotateY(-5deg) rotateX(1.2deg) translateX(-1.5px) rotate(-.2deg)}
+}
+
+/* דופן הצד — נותנת לגוף עובי */
+.sidewall{
+  position:absolute;left:3.5%;top:.6%;width:88%;height:85.5%;
+  border-radius:50% 50% 4% 4% / 31% 31% 3% 3%;
+  background:linear-gradient(100deg,#A96A83 0%,#BC7C94 42%,#C98BA0 76%,#D69BAE 100%);
+  box-shadow:0 26px 34px -22px rgba(90,38,60,.6);
 }
 
 /* גוף המכונה */
@@ -97,20 +110,28 @@ button{font-family:inherit;cursor:pointer}
   position:absolute;left:6%;top:0;width:88%;height:86%;
   border-radius:50% 50% 4% 4% / 31% 31% 3% 3%;
   background:
-    linear-gradient(158deg,#FDEFF3 0%,#F6DCE3 22%,#EDC4D0 52%,#E0AABB 78%,#D296AA 100%);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
+    radial-gradient(125% 55% at 28% 4%,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 46%),
+    radial-gradient(80% 40% at 88% 96%,rgba(146,182,214,.22) 0%,rgba(146,182,214,0) 60%),
+    linear-gradient(158deg,#FDEFF3 0%,#F7DDE4 18%,#F0CAD6 42%,#E3AFC0 66%,#D194A9 86%,#C6879D 100%);
+  background-size:140px 140px,auto,auto,auto;
+  background-blend-mode:overlay,screen,screen,normal;
   box-shadow:
-    inset 0 4px 7px rgba(255,255,255,.95),
-    inset 9px 2px 16px rgba(255,255,255,.5),
-    inset -14px -8px 30px rgba(158,92,116,.42),
-    inset 0 -26px 34px rgba(150,84,108,.24),
-    0 30px 44px -20px rgba(112,54,76,.55),
-    0 6px 14px -6px rgba(112,54,76,.35);
+    inset 0 2px 1px rgba(255,255,255,.95),
+    inset 2px 0 2px rgba(255,255,255,.6),
+    inset -2px 0 3px rgba(255,222,234,.55),
+    inset 10px 4px 18px rgba(255,255,255,.4),
+    inset -16px -10px 34px rgba(152,84,110,.45),
+    inset 0 -28px 36px rgba(142,76,102,.26),
+    0 34px 46px -22px rgba(104,46,70,.6),
+    0 8px 16px -8px rgba(104,46,70,.4);
 }
 .cabinet::before{ /* הבהק העליון */
-  content:"";position:absolute;left:9%;top:3%;width:36%;height:44%;
+  content:"";position:absolute;left:11%;top:4%;width:26%;height:38%;
   border-radius:50%;
-  background:radial-gradient(closest-side,rgba(255,255,255,.85),rgba(255,255,255,0) 72%);
-  filter:blur(7px);pointer-events:none;
+  transform:rotate(-14deg);
+  background:radial-gradient(closest-side,rgba(255,255,255,.95) 0%,rgba(255,255,255,.5) 42%,rgba(255,255,255,0) 78%);
+  filter:blur(4px);pointer-events:none;
 }
 .cabinet::after{ /* הצללת הצד הימני */
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
@@ -125,11 +146,15 @@ button{font-family:inherit;cursor:pointer}
 .bulbs{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .bulb{
   position:absolute;width:8%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
-  background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FBE6EC 34%,#E1AFC0 72%,#C98BA1 100%);
+  background:
+    radial-gradient(circle at 30% 22%,#FFFFFF 0%,rgba(255,255,255,.95) 5%,rgba(255,255,255,0) 24%),
+    radial-gradient(circle at 68% 82%,rgba(255,238,244,.8) 0%,rgba(255,238,244,0) 44%),
+    radial-gradient(circle at 46% 44%,#FBE5EC 0%,#F0C3D1 44%,#D89CB1 76%,#BE879D 92%,#EFCBD8 100%);
   box-shadow:
-    inset 0 -2.5px 4px rgba(150,82,106,.5),
-    inset 0 2px 3px rgba(255,255,255,.95),
-    0 2px 4px rgba(140,76,100,.35);
+    inset 0 -3px 5px rgba(150,82,106,.42),
+    inset 0 2px 3px rgba(255,255,255,.92),
+    0 3px 5px -1px rgba(112,52,76,.5),
+    0 1px 2px rgba(112,52,76,.3);
 }
 .machine-wrap.lit .bulb{animation:bulbGlow .78s ease-in-out infinite alternate}
 .machine-wrap.lit .bulb:nth-child(2){animation-delay:.13s}
@@ -137,10 +162,17 @@ button{font-family:inherit;cursor:pointer}
 .machine-wrap.lit .bulb:nth-child(4){animation-delay:.39s}
 .machine-wrap.lit .bulb:nth-child(5){animation-delay:.52s}
 @keyframes bulbGlow{
-  from{background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FBE6EC 34%,#E1AFC0 72%,#C98BA1 100%);
-       box-shadow:inset 0 -2.5px 4px rgba(150,82,106,.5),inset 0 2px 3px rgba(255,255,255,.95),0 2px 4px rgba(140,76,100,.35)}
-  to{background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FFE9CF 30%,#F4B27E 68%,#DE8E63 100%);
-     box-shadow:inset 0 -2.5px 4px rgba(150,82,60,.45),inset 0 2px 3px rgba(255,255,255,.95),0 0 12px rgba(246,175,120,.85),0 2px 4px rgba(140,76,100,.35)}
+  from{background:
+        radial-gradient(circle at 30% 22%,#FFFFFF 0%,rgba(255,255,255,.95) 5%,rgba(255,255,255,0) 24%),
+        radial-gradient(circle at 68% 82%,rgba(255,238,244,.8) 0%,rgba(255,238,244,0) 44%),
+        radial-gradient(circle at 46% 44%,#FBE5EC 0%,#F0C3D1 44%,#D89CB1 76%,#BE879D 92%,#EFCBD8 100%);
+       box-shadow:inset 0 -3px 5px rgba(150,82,106,.42),inset 0 2px 3px rgba(255,255,255,.92),0 3px 5px -1px rgba(112,52,76,.5)}
+  to{background:
+        radial-gradient(circle at 30% 22%,#FFFFFF 0%,rgba(255,255,255,.95) 6%,rgba(255,255,255,0) 26%),
+        radial-gradient(circle at 68% 82%,rgba(255,226,190,.9) 0%,rgba(255,226,190,0) 46%),
+        radial-gradient(circle at 46% 44%,#FFF3DF 0%,#FBD3A2 40%,#F0A867 74%,#D98B52 92%,#FFE0BC 100%);
+     box-shadow:inset 0 -3px 5px rgba(150,90,50,.4),inset 0 2px 3px rgba(255,255,255,.92),
+                0 0 14px rgba(248,182,120,.9),0 3px 5px -1px rgba(112,52,76,.45)}
 }
 
 /* פס התאורה */
@@ -161,14 +193,23 @@ button{font-family:inherit;cursor:pointer}
 }
 
 /* מסגרת רוז־גולד למסך */
+.screen::after{ /* השתקפות זכוכית על פני כל המסך */
+  content:"";position:absolute;inset:0;border-radius:13px;pointer-events:none;z-index:4;
+  background:linear-gradient(116deg,
+    rgba(255,255,255,0) 28%,rgba(255,255,255,.42) 36%,rgba(255,255,255,.5) 40%,
+    rgba(255,255,255,.1) 47%,rgba(255,255,255,0) 56%);
+}
 .screen{
   position:absolute;left:10.5%;top:37%;width:79%;height:21.5%;
   border-radius:13px;padding:3.4%;
-  background:linear-gradient(148deg,#F3D9C4 0%,#D2A183 26%,#B9805F 46%,#F0D6C1 62%,#C08E6C 82%,#A8714F 100%);
+  background:linear-gradient(146deg,
+    #FDF2E6 0%,#E2C0A1 7%,#B9825B 17%,#EACFB5 26%,#FCF2E7 32%,
+    #C99C74 44%,#9A6842 55%,#E8C9A8 67%,#FBEBDA 73%,#BE8C63 85%,#9C6941 100%);
   box-shadow:
-    inset 0 1.5px 1px rgba(255,255,255,.85),
-    inset 0 -2px 3px rgba(110,60,40,.45),
-    0 8px 14px -6px rgba(120,62,74,.5);
+    inset 0 1.5px 1px rgba(255,255,255,.95),
+    inset 0 -2px 3px rgba(96,52,32,.55),
+    0 10px 16px -7px rgba(94,44,60,.6),
+    0 2px 4px rgba(94,44,60,.35);
 }
 .window{
   position:relative;width:100%;height:100%;direction:ltr;
@@ -234,22 +275,27 @@ button{font-family:inherit;cursor:pointer}
 /* מגש */
 .tray{
   position:absolute;left:12.5%;top:72.5%;width:75%;height:18.5%;border-radius:26px;
-  background:linear-gradient(168deg,#DDA6B7 0%,#EFCAD6 38%,#E7B8C7 70%,#D398AB 100%);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
+    linear-gradient(168deg,#D8A0B2 0%,#EFCAD6 34%,#E7B8C7 66%,#CE93A7 100%);
+  background-size:140px 140px,auto;
+  background-blend-mode:overlay,normal;
   box-shadow:
-    inset 0 7px 16px rgba(124,62,86,.42),
-    inset 0 -3px 4px rgba(255,255,255,.6),
+    inset 0 9px 18px rgba(112,52,78,.5),
+    inset 0 2px 3px rgba(112,52,78,.4),
+    inset 0 -3px 4px rgba(255,255,255,.65),
     0 2px 3px rgba(255,255,255,.5);
 }
 .tray i{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   width:23%;aspect-ratio:1.35;border-radius:50%;
   background:
-    radial-gradient(120% 150% at 38% 26%,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 52%),
-    linear-gradient(168deg,#EFD2B9 0%,#DCB294 46%,#C89A76 78%,#B5855F 100%);
+    radial-gradient(60% 80% at 34% 24%,rgba(255,255,255,.85) 0%,rgba(255,255,255,0) 62%),
+    linear-gradient(166deg,#FBEFE0 0%,#E1BE9E 22%,#C79A76 48%,#F0DAC3 62%,#BC8B65 82%,#A0724E 100%);
   box-shadow:
-    inset 0 -1.5px 3px rgba(110,58,38,.35),
-    inset 0 1.5px 2px rgba(255,255,255,.65),
-    0 2px 5px -1px rgba(120,62,74,.45);
+    inset 0 -1.5px 3px rgba(96,50,32,.45),
+    inset 0 1.5px 2px rgba(255,255,255,.8),
+    0 3px 6px -1px rgba(104,46,70,.5);
 }
 
 /* בסיס */
@@ -281,18 +327,20 @@ button{font-family:inherit;cursor:pointer}
 @keyframes leverHint{0%,74%,100%{transform:rotate(24deg)}84%{transform:rotate(38deg)}}
 .lever .rod{
   position:absolute;left:40%;bottom:0;width:20%;height:88%;border-radius:999px;
-  background:linear-gradient(90deg,#95633F 0%,#CFA07C 22%,#F7E5D4 44%,#C79878 68%,#8B5B3C 100%);
-  box-shadow:0 2px 5px rgba(120,62,74,.45);
+  background:linear-gradient(90deg,#7A5030 0%,#B78962 16%,#EFDBC6 34%,#FFF8EE 43%,#D3A883 58%,#9C6B44 76%,#6E4527 100%);
+  box-shadow:0 3px 6px rgba(104,46,70,.5),inset 0 0 1px rgba(255,255,255,.5);
 }
 .lever .ball{
   position:absolute;left:50%;top:0;transform:translate(-50%,-46%);
   width:64%;aspect-ratio:1;border-radius:50%;
   background:
-    radial-gradient(circle at 32% 25%,rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 34%),
-    radial-gradient(circle at 42% 38%,#EE6D74 0%,#D8404E 40%,#AC1E33 74%,#780E26 100%);
+    radial-gradient(circle at 30% 23%,#FFFFFF 0%,rgba(255,255,255,.95) 5%,rgba(255,255,255,0) 17%),
+    radial-gradient(circle at 64% 84%,rgba(255,146,146,.6) 0%,rgba(255,146,146,0) 42%),
+    radial-gradient(circle at 42% 38%,#EC6B72 0%,#D63C4B 38%,#A81B31 72%,#7A0F26 90%,#B8283C 100%);
   box-shadow:
-    inset -4px -5px 10px rgba(80,8,24,.55),
-    0 7px 12px -4px rgba(120,34,52,.6);
+    inset -5px -6px 12px rgba(74,6,22,.6),
+    inset 2px 3px 6px rgba(255,255,255,.25),
+    0 8px 13px -4px rgba(108,28,46,.65);
 }
 
 /* טקסט מתחת למכונה */
@@ -413,6 +461,10 @@ button{font-family:inherit;cursor:pointer}
 .card .ico{flex:none;width:38px;height:38px}
 .card b{display:block;font-size:15px;letter-spacing:.08em}
 .card small{display:block;margin-top:3px;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+.timeline{display:grid;gap:7px;width:100%}
+.timeline div{display:flex;align-items:baseline;gap:10px}
+.timeline b{font-size:15px;color:var(--green-deep);letter-spacing:.04em;direction:ltr;min-width:46px}
+.timeline span{font-size:13.5px;color:var(--ink-soft)}
 
 .countdown{display:flex;justify-content:center;gap:10px;margin:4px 0 0}
 .cd-box{
@@ -465,7 +517,8 @@ button{font-family:inherit;cursor:pointer}
 
   <div class="machine-wrap armed" id="machine">
 
-    <!-- הבסיס (מאחורי הגוף) -->
+    <!-- דופן הצד + הבסיס (מאחורי הגוף) -->
+    <div class="sidewall"></div>
     <div class="base"></div>
 
     <!-- גוף המכונה -->
@@ -527,7 +580,7 @@ button{font-family:inherit;cursor:pointer}
     <span class="he" dir="rtl">משכו בידית לגילוי התאריך</span>
   </p>
   <p class="reveal-date" id="revealDate">28.10.26</p>
-  <button class="cta" id="openInvite">לפתיחת ההזמנה</button>
+  <button class="cta" id="openInvite" hidden>לפתיחת ההזמנה</button>
 </section>
 
 <div id="confetti"></div>
@@ -695,7 +748,11 @@ button{font-family:inherit;cursor:pointer}
       </div>
       <div class="card">
         <svg class="ico" viewBox="0 0 40 40" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round"><circle cx="20" cy="20" r="14"/><path d="M20 11v10l7 4"/></svg>
-        <div><b>קבלת פנים <span id="tRec">19:00</span></b><small>חופה <span id="tChu">20:00</span> · ואז רוקדים עד הסוף</small></div>
+        <div class="timeline">
+          <div><b id="tRec">19:30</b><span>קבלת פנים ואוכל טוב</span></div>
+          <div><b id="tChu">21:30</b><span>חופה</span></div>
+          <div><b id="tDan">22:00</b><span>ריקודים ומלא אלכוהול</span></div>
+        </div>
       </div>
       <div class="card">
         <svg class="ico" viewBox="0 0 40 40" fill="none" stroke="#1A1A1A" stroke-width="2.2" stroke-linecap="round"><path d="M20 35s11-11 11-19a11 11 0 1 0-22 0c0 8 11 19 11 19Z"/><circle cx="20" cy="16" r="4"/></svg>
@@ -741,11 +798,12 @@ const CONFIG = {
   dateLabel:  '28.10.26',            // התאריך שמופיע על הגלגלים ובהזמנה
   reels:      ['28','10','26'],      // מה נעצר בכל גלגל
   isoDate:    '2026-10-28',          // YYYY-MM-DD
-  reception:  '19:00',               // קבלת פנים
-  chuppah:    '20:00',               // חופה
-  venueName:  'שם האולם',
-  venueAddr:  'רחוב וכתובת, עיר',
-  wazeQuery:  'שם האולם',            // מה לחפש ב-Waze
+  reception:  '19:30',               // קבלת פנים
+  chuppah:    '21:30',               // חופה
+  dancing:    '22:00',               // ריקודים
+  venueName:  'אביגדור',
+  venueAddr:  'בן אביגדור 22, תל אביב',
+  wazeQuery:  'בן אביגדור 22 תל אביב',  // מה לחפש ב-Waze
   rsvpPhone:  '972500000000',        // מספר לאישור הגעה (וואטסאפ, בלי +)
   rsvpBy:     '1.10.2026'
 };
@@ -896,8 +954,8 @@ function finish(){
   hint.classList.add('gone');
   revealEl.textContent = CONFIG.dateLabel;
   revealEl.classList.add('show');
-  openBtn.classList.add('show');
   confetti(80);
+  setTimeout(openInvite, 1900);      // רגע להסתכל על התאריך, ואז נכנסים אוטומטית להזמנה
   tick(320, .06, .25);
   if (navigator.vibrate) { try { navigator.vibrate([18, 60, 18]); } catch(e){} }
 }
@@ -935,13 +993,17 @@ function confetti(n){
 const slotStage   = document.getElementById('stage-slot');
 const inviteStage = document.getElementById('stage-invite');
 
-openBtn.addEventListener('click', () => {
+let opened = false;
+function openInvite(){
+  if (opened) return;
+  opened = true;
   slotStage.classList.add('gone');
   inviteStage.classList.add('on');
   window.scrollTo(0, 0);
   requestAnimationFrame(() => requestAnimationFrame(() => inviteStage.classList.add('visible')));
   setTimeout(() => { slotStage.style.display = 'none'; confetti(40); }, 750);
-});
+}
+openBtn.addEventListener('click', openInvite);
 
 /* ---------- מילוי פרטי ההזמנה ---------- */
 const D = CONFIG;
@@ -952,6 +1014,7 @@ document.getElementById('namesLine').textContent = D.bride + ' & ' + D.groom;
 document.getElementById('dateLine').textContent  = D.dateLabel;
 document.getElementById('tRec').textContent      = D.reception;
 document.getElementById('tChu').textContent      = D.chuppah;
+document.getElementById('tDan').textContent      = D.dancing;
 document.getElementById('venueName').textContent = D.venueName;
 document.getElementById('venueAddr').textContent = D.venueAddr;
 document.getElementById('rsvpNote').textContent  = 'נא לאשר הגעה עד ' + D.rsvpBy + ' · אפשר גם להשיב בהודעה';
@@ -979,7 +1042,7 @@ const ics = [
   'DTEND:'   + icsStamp(eventEnd),
   'SUMMARY:החתונה של ' + D.bride + ' ו' + D.groom,
   'LOCATION:' + D.venueName + ', ' + D.venueAddr,
-  'DESCRIPTION:קבלת פנים ' + D.reception + ' · חופה ' + D.chuppah,
+  'DESCRIPTION:קבלת פנים ' + D.reception + ' · חופה ' + D.chuppah + ' · ריקודים ' + D.dancing,
   'END:VEVENT','END:VCALENDAR'
 ].join('\r\n');
 document.getElementById('calBtn').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
