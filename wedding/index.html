@@ -419,15 +419,13 @@ button{font-family:inherit;cursor:pointer}
 }
 
 .hero{position:relative;text-align:center}
-.hero-title{
-  margin:0;
-  font-size:clamp(26px,8.5vw,40px);
-  font-weight:800;
-  color:var(--green);
-  letter-spacing:.02em;
-  line-height:1.1;
+.arc-title{width:min(100%,330px);margin:2px auto 0;direction:ltr}
+.arc-title text{
+  font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;
+  font-size:34px;font-weight:800;letter-spacing:1px;
+  fill:var(--green);
+  paint-order:stroke;stroke:var(--green);stroke-width:1.1;stroke-linejoin:round;
 }
-.hero-title span{display:block;color:var(--green-deep);font-size:.52em;letter-spacing:.3em;margin-top:10px;padding-inline-start:.3em}
 .couple-art{width:100%;margin:clamp(6px,2vw,14px) auto 0}
 .names{
   margin:6px 0 0;
@@ -442,7 +440,9 @@ button{font-family:inherit;cursor:pointer}
   letter-spacing:.08em;direction:ltr;
 }
 .day-line{margin:6px 0 0;font-size:14px;color:var(--ink-soft);letter-spacing:.12em}
+.dash{display:block;width:38px;height:2px;border-radius:2px;background:var(--green);opacity:.65;margin:12px auto 10px}
 .tagline{margin:14px 0 0;font-size:clamp(14px,4.4vw,17px);color:var(--green-deep)}
+.tagline-en{margin:7px 0 0;font-family:var(--serif);font-style:italic;font-size:clamp(13px,3.9vw,15px);color:var(--green);letter-spacing:.02em}
 
 .rule{display:flex;align-items:center;gap:12px;margin:clamp(22px,6vw,32px) 0}
 .rule::before,.rule::after{content:"";flex:1;height:2px;background:var(--green);opacity:.4;border-radius:2px}
@@ -598,38 +598,66 @@ button{font-family:inherit;cursor:pointer}
   <div class="sheet">
 
     <header class="hero">
-      <h2 class="hero-title" dir="ltr">SAVE THE DATE!<span>WE'RE GETTING MARRIED</span></h2>
+      <svg class="arc-title" viewBox="0 0 400 104" role="img" aria-label="Save the date!">
+        <defs><path id="arcTitle" d="M20,92 A636,636 0 0 1 380,92"/></defs>
+        <text><textPath href="#arcTitle" startOffset="50%" text-anchor="middle">SAVE THE DATE!</textPath></text>
+      </svg>
 
       <!-- ====== איור קווי: זוג + כלב ====== -->
       <svg class="couple-art" viewBox="0 0 420 520" role="img" aria-label="איור קווי של הזוג עם הכלב">
         <g fill="none" stroke="#1A1A1A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
 
-          <!-- ===== קישוטים ===== -->
-          <!-- כדור דיסקו -->
-          <g stroke="#2E4633" stroke-width="2.2">
-            <path d="M386,10 v14"/>
-            <circle cx="386" cy="48" r="24"/>
-            <path d="M362,48 h48 M386,24 v48"/>
-            <path d="M370,30 c10,12 10,24 0,36 M402,30 c-10,12 -10,24 0,36"/>
-            <path d="M366,38 h40 M366,58 h40"/>
-          </g>
-          <!-- כוס יין -->
-          <g stroke="#2E4633" stroke-width="2.2">
-            <path d="M18,86 h52 c0,32 -12,48 -26,48 c-14,0 -26,-16 -26,-48 Z" fill="#2E4633"/>
-            <path d="M44,134 v40"/>
-            <path d="M24,176 h40"/>
-          </g>
-          <!-- לב -->
-          <path d="M212,42 c-6,-10 -21,-6 -21,5 c0,10 13,16 21,24 c8,-8 21,-14 21,-24 c0,-11 -15,-15 -21,-5 Z" stroke="#2E4633"/>
-          <!-- ניצוצות -->
-          <g stroke="#2E4633" stroke-width="2.2">
-            <path d="M96,58 c2,10 5,13 14,15 c-9,2 -12,5 -14,15 c-2,-10 -5,-13 -14,-15 c9,-2 12,-5 14,-15 Z"/>
-            <path d="M320,40 c1,7 4,9 10,11 c-6,1 -9,4 -10,11 c-2,-7 -4,-9 -10,-11 c6,-2 8,-4 10,-11 Z"/>
-            <path d="M400,436 c2,9 5,12 13,14 c-8,2 -11,5 -13,14 c-2,-9 -5,-12 -13,-14 c8,-2 11,-5 13,-14 Z"/>
-            <path d="M40,430 c1,7 4,9 10,11 c-6,2 -9,4 -10,11 c-2,-7 -4,-9 -10,-11 c6,-2 8,-4 10,-11 Z"/>
+          <!-- ===== דודלים מסביב לזוג ===== -->
+          <g stroke="#2E4633" stroke-width="2.1">
+            <!-- כדורי דיסקו -->
+            <g transform="translate(354,64)">
+              <path d="M0,-27 v8"/><circle cx="0" cy="0" r="13"/>
+              <path d="M-13,0 h26 M0,-13 v26"/>
+              <path d="M-7,-11 c4,7 4,15 0,22 M7,-11 c-4,7 -4,15 0,22"/>
+            </g>
+            <g transform="translate(74,300) scale(.62)">
+              <path d="M0,-30 v10"/><circle cx="0" cy="0" r="14"/>
+              <path d="M-14,0 h28 M0,-14 v28"/>
+              <path d="M-8,-12 c5,8 5,16 0,24 M8,-12 c-5,8 -5,16 0,24"/>
+            </g>
+            <!-- לחיים -->
+            <g transform="translate(356,198) scale(.6)">
+              <path d="M-30,-22 l10,26 c2,5 8,7 12,5 c5,-2 6,-8 4,-13 l-11,-24 Z"/>
+              <path d="M-4,10 l7,17 M-2,29 l17,-7"/>
+              <g transform="scale(-1,1)">
+                <path d="M-30,-22 l10,26 c2,5 8,7 12,5 c5,-2 6,-8 4,-13 l-11,-24 Z"/>
+                <path d="M-4,10 l7,17 M-2,29 l17,-7"/>
+              </g>
+            </g>
+            <!-- כוס יין בודדת -->
+            <g transform="translate(62,150) scale(.5)">
+              <path d="M-26,-30 h52 c0,32 -12,48 -26,48 c-14,0 -26,-16 -26,-48 Z" fill="#2E4633"/>
+              <path d="M0,18 v26 M-20,46 h40"/>
+            </g>
+            <!-- לבבות -->
+            <g transform="translate(196,52) scale(.42)">
+              <path d="M0,8 c-7,-9 -20,-5 -20,5 c0,9 12,15 20,22 c8,-7 20,-13 20,-22 c0,-10 -13,-14 -20,-5 Z"/>
+            </g>
+            <g transform="translate(336,126) scale(.28)">
+              <path d="M0,8 c-7,-9 -20,-5 -20,5 c0,9 12,15 20,22 c8,-7 20,-13 20,-22 c0,-10 -13,-14 -20,-5 Z"/>
+            </g>
+            <g transform="translate(92,214) scale(.26)">
+              <path d="M0,8 c-7,-9 -20,-5 -20,5 c0,9 12,15 20,22 c8,-7 20,-13 20,-22 c0,-10 -13,-14 -20,-5 Z"/>
+            </g>
+            <!-- ניצוצות -->
+            <g stroke-width="2">
+              <g transform="translate(112,110) scale(.52)"><path d="M0,-14 c2,9 5,12 14,14 c-9,2 -12,5 -14,14 c-2,-9 -5,-12 -14,-14 c9,-2 12,-5 14,-14 Z"/></g>
+              <g transform="translate(300,84) scale(.42)"><path d="M0,-14 c2,9 5,12 14,14 c-9,2 -12,5 -14,14 c-2,-9 -5,-12 -14,-14 c9,-2 12,-5 14,-14 Z"/></g>
+              <g transform="translate(378,306) scale(.5)"><path d="M0,-14 c2,9 5,12 14,14 c-9,2 -12,5 -14,14 c-2,-9 -5,-12 -14,-14 c9,-2 12,-5 14,-14 Z"/></g>
+              <g transform="translate(66,392) scale(.46)"><path d="M0,-14 c2,9 5,12 14,14 c-9,2 -12,5 -14,14 c-2,-9 -5,-12 -14,-14 c9,-2 12,-5 14,-14 Z"/></g>
+              <g transform="translate(392,438) scale(.38)"><path d="M0,-14 c2,9 5,12 14,14 c-9,2 -12,5 -14,14 c-2,-9 -5,-12 -14,-14 c9,-2 12,-5 14,-14 Z"/></g>
+              <!-- כוכביות זעירות -->
+              <path d="M120,268 v-11 M114.5,262.5 h11 M116,258.5 l8,8 M124,258.5 l-8,8"/>
+              <path d="M348,268 v-9 M343.5,263.5 h9 M345,260 l7,7 M352,260 l-7,7"/>
+            </g>
           </g>
 
-          <!-- ===== הכלה ===== -->
+          <g transform="translate(20,0)"><!-- ===== הכלה ===== -->
           <!-- הינומה מאחור -->
           <path d="M138,60 C106,88 82,216 88,344 C90,394 98,424 106,442" stroke-width="2.2"/>
           <path d="M106,442 C114,446 122,444 128,438" stroke-width="2.2"/>
@@ -667,7 +695,9 @@ button{font-family:inherit;cursor:pointer}
           <path d="M178,184 C192,210 202,240 210,266"/>
           <path d="M210,266 C203,278 206,294 218,300 C228,305 240,302 243,294 C245,288 242,282 236,282"/>
 
-          <!-- ===== החתן ===== -->
+          </g>
+
+          <g transform="translate(-14,0)"><!-- ===== החתן ===== -->
           <!-- פנים -->
           <path d="M246,104 C246,78 256,62 272,62 C288,62 298,78 298,104 C298,128 287,142 272,142 C257,142 246,128 246,104 Z"/>
           <!-- שיער -->
@@ -708,7 +738,9 @@ button{font-family:inherit;cursor:pointer}
           <!-- יד ימין בכיס -->
           <path d="M303,301 C297,307 296,316 303,319 C310,322 316,314 314,304"/>
 
-          <!-- ===== הכלב ===== -->
+          </g>
+
+          <g transform="translate(-34,6)"><!-- ===== הכלב ===== -->
           <!-- אוזניים -->
           <path d="M341,352 C329,356 324,376 330,390 C334,397 341,393 342,384"/>
           <path d="M375,350 C387,354 392,374 386,388 C382,395 375,391 374,382"/>
@@ -728,13 +760,16 @@ button{font-family:inherit;cursor:pointer}
           <path d="M340,400 C349,408 363,408 371,400" stroke="#C4703F" stroke-width="2.4"/>
           <!-- זנב -->
           <path d="M396,448 C408,444 414,434 409,428 C405,424 399,427 397,432"/>
+          </g>
         </g>
       </svg>
 
       <p class="names" id="namesLine">שחף &amp; תומר</p>
+      <span class="dash" aria-hidden="true"></span>
       <p class="big-date" id="dateLine">28.10.26</p>
       <p class="day-line" id="dayLine"></p>
       <p class="tagline">מתרגשים להתחתן — ושמחים לחגוג איתכם!</p>
+      <p class="tagline-en" dir="ltr">We can't wait to celebrate with you!</p>
     </header>
 
     <div class="rule"><svg viewBox="0 0 24 24" fill="none" stroke="#8FAE83" stroke-width="2.2" stroke-linecap="round"><path d="M12 20 C5 14 2 10 4.5 6.5 C7 3 11 5 12 8 C13 5 17 3 19.5 6.5 C22 10 19 14 12 20 Z"/></svg></div>
