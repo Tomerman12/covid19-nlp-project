@@ -146,7 +146,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE, delay: 1.15 }}
-          className="relative inline-flex items-center flex-wrap justify-center"
+          className="relative inline-flex items-center flex-wrap justify-center chrome-glass"
           style={{
             gap: 14,
             border: '1px solid var(--line)',

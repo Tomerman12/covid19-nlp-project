@@ -119,7 +119,7 @@ export default function PartyLayer({
         target="_blank"
         rel="noopener"
         data-cursor
-        className="fixed flex items-center"
+        className="fixed flex items-center chrome-glass press"
         style={{
           bottom: 76,
           insetInlineEnd: 18,
@@ -151,7 +151,7 @@ export default function PartyLayer({
         onClick={toggleMute}
         aria-label={muted ? 'ביטול השתקה' : 'השתקת המוזיקה'}
         data-cursor
-        className="fixed flex items-center justify-center"
+        className="fixed flex items-center justify-center chrome-glass press"
         style={{
           bottom: 134,
           insetInlineEnd: 18,
@@ -185,7 +185,7 @@ export default function PartyLayer({
         onClick={handleToggle}
         aria-pressed={party}
         data-cursor
-        className="fixed flex items-center"
+        className="fixed flex items-center chrome-glass press"
         style={{
           bottom: 18,
           insetInlineEnd: 18,

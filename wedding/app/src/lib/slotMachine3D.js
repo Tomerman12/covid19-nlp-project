@@ -336,7 +336,7 @@ export function createSlotMachine3D(canvas, opts) {
 
   /* ---------- ידית ---------- */
   const lever = new THREE.Group();
-  lever.position.set(BODY_W / 2 + 0.02, 2.3, 0.35);
+  lever.position.set(BODY_W / 2 + 0.02, 2.3, 0.62);
   machine.add(lever);
 
   const mount = new THREE.Mesh(
@@ -344,7 +344,7 @@ export function createSlotMachine3D(canvas, opts) {
     new THREE.MeshStandardMaterial({ color: GOLD, roughness: 0.2, metalness: 1, envMapIntensity: 1.5 })
   );
   mount.rotation.x = Math.PI / 2;
-  mount.position.set(BODY_W / 2 + 0.02, 2.3, 0.35);
+  mount.position.set(BODY_W / 2 + 0.02, 2.3, 0.62);
   mount.castShadow = true;
   machine.add(mount);
 
@@ -364,7 +364,7 @@ export function createSlotMachine3D(canvas, opts) {
   ball.castShadow = true;
   lever.add(ball);
 
-  const LEVER_REST = -0.36, LEVER_PULL = 0.95;
+  const LEVER_REST = -0.36, LEVER_PULL = -1.78;
   lever.rotation.z = LEVER_REST;
 
   /* ---------- רצפה לצל ---------- */
@@ -381,109 +381,258 @@ export function createSlotMachine3D(canvas, opts) {
   function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
   function easeInQuad(t){ return t * t; }
   function easeOutBack(t){ const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+  function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
 
-  let spinning = false, done = false;
   const SEG = (Math.PI * 2) / FACES;
-  const clock = new THREE.Clock();
+  let spinning = false, done = false, disposed = false;
   let litAt = 0;
 
-  function spin() {
-    if (spinning || done) return;
-    spinning = true;
-    const t0 = performance.now();
+  /* ---------- לולאת רינדור אחת לכל התנועות ---------- */
+  let raf = 0, looping = false, lastFrame = 0;
 
-    // משיכת הידית: למטה מהר, חזרה עם קפיץ
-    const leverAnim = { start: t0, down: 190, up: 620 };
+  function render(){ if (!disposed) renderer.render(scene, camera); }
 
-    const plans = REELS.map((R_, i) => {
-      const dur   = 2500 + i * 620;
-      const turns = 5 + i;
-      // מרכז הפאה מול הצופה בסוף הסיבוב
-      const end   = turns * Math.PI * 2 - (R_.stop + 0.5) * SEG;
-      return { dur: dur, end: end, back: -0.16, stopped: false };
-    });
-
-    function frame(now) {
-      const t = now - t0;
-
-      // ידית
-      if (t < leverAnim.down) {
-        lever.rotation.z = LEVER_REST + (LEVER_PULL - LEVER_REST) * easeInQuad(t / leverAnim.down);
-      } else if (t < leverAnim.down + leverAnim.up) {
-        const k = (t - leverAnim.down) / leverAnim.up;
-        lever.rotation.z = LEVER_PULL + (LEVER_REST - LEVER_PULL) * easeOutBack(k);
-      } else {
-        lever.rotation.z = LEVER_REST;
-      }
-
-      let allDone = true;
-      REELS.forEach((R_, i) => {
-        const p = plans[i];
-        const k = Math.min(t / p.dur, 1);
-        if (k < 1) allDone = false;
-
-        let a;
-        if (k < 0.06) {                       // נסיגה קטנה לאחור
-          a = p.back * easeOutCubic(k / 0.06);
-        } else if (k < 0.34) {                // האצה
-          const u = (k - 0.06) / 0.28;
-          a = p.back + (p.end * 0.26 - p.back) * easeInQuad(u);
-        } else if (k < 0.72) {                // מהירות קבועה
-          const u = (k - 0.34) / 0.38;
-          a = p.end * 0.26 + (p.end * 0.72 - p.end * 0.26) * u;
-        } else if (k < 0.94) {                // האטה + חריגה מעבר לסמל
-          const u = (k - 0.72) / 0.22;
-          a = p.end * 0.72 + ((p.end - SEG * 0.34) - p.end * 0.72) * easeOutCubic(u);
-        } else {                              // נעילה חזרה על הסמל
-          const u = (k - 0.94) / 0.06;
-          a = (p.end - SEG * 0.34) + (SEG * 0.34) * easeOutBack(u);
-        }
-        R_.drum.rotation.y = a;
-
-        // החלפת טקסטורה למרוחה כשהתוף מהיר
-        const fast = k > 0.10 && k < 0.86;
-        const want = fast ? R_.smear : R_.sharp;
-        if (R_.mat.map !== want) { R_.mat.map = want; R_.mat.needsUpdate = true; }
-
-        if (k >= 1 && !p.stopped) { p.stopped = true; O.onStop(i); }
-      });
-
-      renderer.render(scene, camera);
-
-      if (!allDone) {
-        requestAnimationFrame(frame);
-      } else {
-        spinning = false; done = true; litAt = performance.now();
-        O.onFinish();
-        requestAnimationFrame(idle);
-      }
-    }
-    requestAnimationFrame(frame);
+  function wake() {
+    if (looping || disposed) return;
+    looping = true;
+    lastFrame = performance.now();
+    raf = requestAnimationFrame(tick);
   }
 
-  function idle(now) {
-    // הבהוב הנורות אחרי הזכייה
-    if (litAt) {
-      const t = (now - litAt) / 1000;
-      bulbs.forEach((b, i) => {
-        b.material.emissiveIntensity = 0.55 + 0.45 * Math.sin(t * 5 - i * 0.7);
-      });
+  function tick(now) {
+    if (disposed) { looping = false; return; }
+    const dt = Math.min(now - lastFrame, 250);   // חוסם רק קפיצה של טאב ברקע, לא מאט מכשיר איטי
+    lastFrame = now;
+
+    let busy = false;
+    if (leverSpring) { stepLever(dt / 1000); busy = true; }
+    if (spinning)    { stepReels(dt);        busy = true; }
+    if (litAt)       { stepBulbs(now);       busy = true; }
+
+    render();
+
+    if (busy) raf = requestAnimationFrame(tick);
+    else looping = false;
+  }
+
+  /* ---------- הידית: נמשכת ביד, לא לפי תסריט ---------- */
+  const LEVER_TRAVEL = 96;      // כמה פיקסלים של גרירה = משיכה מלאה
+  let leverP = 0;               // 0 = מנוחה, 1 = משוך עד הסוף
+  let leverSpring = null;       // {target, v, damping, w, onArrive}
+
+  function applyLever(p) {
+    leverP = p;
+    lever.rotation.z = LEVER_REST + (LEVER_PULL - LEVER_REST) * p;
+  }
+
+  /* התנגדות גוברת מעבר לסוף המהלך — הידית לא נעצרת כמו קיר */
+  function rubber(x) {
+    if (x <= 1) return x;
+    const over = x - 1;
+    return 1 + over / (1 + over * 2.6);
+  }
+
+  /** קפיץ אמיתי: מתחיל מהערך שעל המסך ומקבל את המהירות של האצבע */
+  function springLever(target, v0, damping, response, onArrive) {
+    leverSpring = {
+      target: target,
+      v: v0 || 0,
+      damping: damping,
+      w: (2 * Math.PI) / response,
+      onArrive: onArrive || null,
+    };
+    wake();
+  }
+
+  /* אינטגרציה בצעדים קבועים — הקפיץ יציב גם כשהפריימים איטיים */
+  function stepLever(dt) {
+    const s = leverSpring;
+    const h = 1 / 120;
+    let left = Math.min(dt, 0.25);
+    while (left > 0) {
+      const step = left > h ? h : left;
+      left -= step;
+      const a = -s.w * s.w * (leverP - s.target) - 2 * s.damping * s.w * s.v;
+      s.v += a * step;
+      applyLever(leverP + s.v * step);
+      if (Math.abs(leverP - s.target) < 0.002 && Math.abs(s.v) < 0.02) {
+        applyLever(s.target);
+        const cb = s.onArrive;
+        leverSpring = null;
+        if (cb) cb();
+        return;
+      }
     }
-    renderer.render(scene, camera);
-    if (litAt) requestAnimationFrame(idle);
+  }
+
+  /** אצבע נגעה במכונה — הידית נותנת מיד קצת, עוד לפני שזזו */
+  function grabLever() {
+    if (spinning || done) return;
+    leverSpring = null;
+    applyLever(Math.max(leverP, 0.1));
+    render();
+  }
+
+  /** גרירה: הידית עוקבת אחרי האצבע אחד־לאחד */
+  function dragLever(dy) {
+    if (spinning || done) return;
+    leverSpring = null;
+    applyLever(rubber(Math.max(0, 0.1 + dy / LEVER_TRAVEL)));
+    render();
+  }
+
+  /**
+   * שחרור. velocity מגיע בפיקסלים לשנייה ומתורגם למהלך ידית לשנייה.
+   * מעל חצי מהלך — מתחייבים, והמהירות שהאצבע נתנה עוברת לגלגלים.
+   */
+  function releaseLever(velocity, wasTap) {
+    if (spinning || done) return;
+    const v = (velocity || 0) / LEVER_TRAVEL;
+    if (wasTap) {                                   // נגיעה קצרה: משיכה אוטומטית
+      springLever(1, 6, 1.0, 0.18, function () {
+        startSpin(1);
+        springLever(0, 0, 0.8, 0.34);
+      });
+      return;
+    }
+    const projected = leverP + v * 0.12;            // לפי הכיוון שאליו הלכה היד
+    if (projected >= 0.5) {
+      startSpin(clamp(0.85 + Math.abs(v) * 0.16, 0.85, 1.5));
+      springLever(0, v, 0.8, 0.34);                 // חוזרת עם המומנטום של המשיכה
+    } else {
+      springLever(0, v, 1.0, 0.4);                  // לא הספיק — חוזרת בשקט
+    }
+  }
+
+  /* ---------- הגלגלים ---------- */
+  let spin = null;          // {vt, plans}
+  let timeScale = 1;
+
+  function startSpin(power) {
+    if (spinning || done) return;
+    const p = power || 1;
+    timeScale = 1;
+    spin = {
+      vt: 0,
+      plans: REELS.map(function (R_, i) {
+        return {
+          dur: (2500 + i * 620) / clamp(p, 0.9, 1.35),
+          end: Math.round((5 + i) * p) * Math.PI * 2 - (R_.stop + 0.5) * SEG,
+          back: -0.16,
+          stopped: false,
+        };
+      }),
+    };
+    spinning = true;
+    wake();
+  }
+
+  function stepReels(dt) {
+    spin.vt += dt * timeScale;
+    const t = spin.vt;
+    let allDone = true;
+
+    REELS.forEach(function (R_, i) {
+      const pl = spin.plans[i];
+      const k = Math.min(t / pl.dur, 1);
+      if (k < 1) allDone = false;
+
+      let a;
+      if (k < 0.06) {                       // נסיגה קטנה לאחור
+        a = pl.back * easeOutCubic(k / 0.06);
+      } else if (k < 0.34) {                // האצה
+        const u = (k - 0.06) / 0.28;
+        a = pl.back + (pl.end * 0.26 - pl.back) * easeInQuad(u);
+      } else if (k < 0.72) {                // מהירות קבועה
+        const u = (k - 0.34) / 0.38;
+        a = pl.end * 0.26 + (pl.end * 0.72 - pl.end * 0.26) * u;
+      } else if (k < 0.94) {                // האטה + חריגה מעבר לסמל
+        const u = (k - 0.72) / 0.22;
+        a = pl.end * 0.72 + ((pl.end - SEG * 0.34) - pl.end * 0.72) * easeOutCubic(u);
+      } else {                              // נעילה חזרה על הסמל
+        const u = (k - 0.94) / 0.06;
+        a = (pl.end - SEG * 0.34) + (SEG * 0.34) * easeOutBack(u);
+      }
+      R_.drum.rotation.y = a;
+
+      const fast = k > 0.10 && k < 0.86;
+      const want = fast ? R_.smear : R_.sharp;
+      if (R_.mat.map !== want) { R_.mat.map = want; R_.mat.needsUpdate = true; }
+
+      // הקליק נשמע ברגע החבטה עצמה, לא אחרי שהכול נרגע
+      if (!pl.stopped && k >= 0.945) { pl.stopped = true; O.onStop(i); }
+    });
+
+    if (allDone) {
+      spinning = false;
+      done = true;
+      litAt = performance.now();
+      O.onFinish();
+    }
+  }
+
+  /** נגיעה בזמן הסיבוב מזרזת אותו במקום להתעלם ממנה */
+  function skip() {
+    if (spinning) timeScale = 3.4;
+  }
+
+  function stepBulbs(now) {
+    const t = (now - litAt) / 1000;
+    bulbs.forEach(function (b, i) {
+      b.material.emissiveIntensity = 0.55 + 0.45 * Math.sin(t * 5 - i * 0.7);
+    });
+  }
+
+  /** תנועה מצומצמת: מציגים את התוצאה בלי הסיבוב */
+  function showResult() {
+    done = true;
+    REELS.forEach(function (R_) { R_.drum.rotation.y = -(R_.stop + 0.5) * SEG; });
+    bulbs.forEach(function (b) { b.material.emissiveIntensity = 0.8; });
+    render();
   }
 
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
-    if (!w || !h) return;
+    if (!w || !h || disposed) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
+    render();
   }
   window.addEventListener('resize', resize);
   resize();
-  renderer.render(scene, camera);
+  render();
 
-  return { spin: spin, resize: resize };
+  /** משחרר הכול: לולאת הרינדור, המאזינים, הגאומטריות והחומרים */
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    litAt = 0;
+    looping = false;
+    cancelAnimationFrame(raf);
+    window.removeEventListener('resize', resize);
+    scene.traverse(function (o) {
+      if (o.geometry) o.geometry.dispose();
+      const mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+      mats.forEach(function (m) {
+        Object.keys(m).forEach(function (k) { const v = m[k]; if (v && v.isTexture) v.dispose(); });
+        m.dispose();
+      });
+    });
+    REELS.forEach(function (R_) { R_.sharp.dispose(); R_.smear.dispose(); });
+    if (scene.environment) scene.environment.dispose();
+    renderer.dispose();
+  }
+
+  return {
+    grabLever: grabLever,
+    dragLever: dragLever,
+    releaseLever: releaseLever,
+    skip: skip,
+    showResult: showResult,
+    resize: resize,
+    dispose: dispose,
+    isSpinning: function () { return spinning; },
+    isDone: function () { return done; }
+  };
 };

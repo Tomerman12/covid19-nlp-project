@@ -307,6 +307,22 @@ body.locked {
   border-color: var(--champ2);
   background: #ffffff;
 }
+/* תגובה ברגע הלחיצה, לא בשחרור */
+.btn:active {
+  transform: scale(0.972);
+  transition: transform 100ms ease-out;
+}
+.btn--primary:active {
+  box-shadow: 0 6px 18px rgba(90, 60, 90, 0.26);
+}
+/* הכפתורים הצפים — נלחצים מיד עם המגע */
+.press {
+  transition: transform 120ms ease-out;
+}
+.press:active {
+  transform: scale(0.94);
+  transition: transform 100ms ease-out;
+}
 .btn--primary {
   border: none;
   color: #fff;
@@ -344,6 +360,29 @@ body.locked {
 @keyframes hue {
   from { filter: hue-rotate(0deg) blur(var(--glow-blur, 90px)); }
   to { filter: hue-rotate(360deg) blur(var(--glow-blur, 90px)); }
+}
+
+/* שקיפות מצומצמת: המשטחים הצפים נעשים אטומים */
+@media (prefers-reduced-transparency: reduce) {
+  .chrome-glass {
+    background: var(--bg2) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* ניגודיות מוגברת: רקע אטום וגבול מוגדר */
+@media (prefers-contrast: more) {
+  .chrome-glass {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid var(--ivory) !important;
+  }
+  .btn {
+    border-color: var(--ivory);
+    background: #ffffff;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
