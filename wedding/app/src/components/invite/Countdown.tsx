@@ -5,6 +5,7 @@ import { FlickeringGrid } from '@/components/vendor/flickering-grid'
 import { TARGET_TS, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, CornerSpray } from './Flourish'
+import { PressedBotanicals, SprigRow } from './Botanicals'
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -88,6 +89,7 @@ export default function Countdown() {
         maxOpacity={0.13}
         masked
       />
+      <PressedBotanicals set="countdown" />
       <div className="absolute pointer-events-none" style={{ top: 8, insetInlineStart: 8, opacity: 0.85 }} aria-hidden="true">
         <CornerSpray size={70} />
       </div>
@@ -98,6 +100,7 @@ export default function Countdown() {
       <FadeUp>
         <Flourish color="#e58c54" />
         <Eyebrow>Counting Down</Eyebrow>
+        <SprigRow color="#e58c54" />
       </FadeUp>
       <FadeUp delay={0.08}>
         <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '14px 0 8px', color: 'var(--champ2)' }}>

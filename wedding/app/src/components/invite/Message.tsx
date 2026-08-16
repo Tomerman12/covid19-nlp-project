@@ -1,10 +1,12 @@
 import { Eyebrow, FadeUp, MaskLine } from './shared'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, CornerSpray, GarlandDivider } from './Flourish'
+import { PressedBotanicals, SprigRow } from './Botanicals'
 
 export default function Message() {
   return (
     <section className="relative" style={flavorStyle(FLAVORS.blossom, { color: 'var(--ink)' })}>
+      <PressedBotanicals set="message" />
       <div className="absolute pointer-events-none" style={{ top: 10, insetInlineStart: 8, opacity: 0.85 }} aria-hidden="true">
         <CornerSpray size={72} />
       </div>

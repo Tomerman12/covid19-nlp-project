@@ -2,6 +2,7 @@ import { Eyebrow, FadeUp } from './shared'
 import { SCHEDULE } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, GarlandDivider } from './Flourish'
+import { PressedBotanicals, SprigRow, TimeSprig } from './Botanicals'
 
 /* the dots stay multicolored ELEMENTS; the type is unified rose */
 const DOT_COLORS = ['#d9769b', '#7f9c5e', '#8fa3e8']
@@ -10,7 +11,8 @@ const DOT_GLOWS = ['rgba(217,118,155,.4)', 'rgba(127,156,94,.4)', 'rgba(143,163,
 /** horizontal schedule — the whole evening in one row */
 export default function Timeline() {
   return (
-    <section style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(40px, 6vh, 64px) 18px' })}>
+    <section className="relative" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(40px, 6vh, 64px) 18px' })}>
+      <PressedBotanicals set="timeline" />
       <div className="mx-auto" style={{ maxWidth: '56rem' }}>
       <div className="text-center">
         <FadeUp>
@@ -78,6 +80,9 @@ export default function Timeline() {
                 <p style={{ color: 'var(--muted)', margin: '4px 0 0', fontSize: 'clamp(0.78rem, 2.6vw, 0.95rem)', lineHeight: 1.55 }}>
                   {ev.desc}
                 </p>
+                <div className="flex justify-center" style={{ marginTop: 10 }}>
+                  <TimeSprig color={DOT_COLORS[i]} />
+                </div>
               </FadeUp>
             </li>
           ))}

@@ -3,6 +3,7 @@ import { Eyebrow, FadeUp, MagneticLink, IconNav, IconCal, IconDown } from './sha
 import { BorderBeam } from '@/components/vendor/border-beam'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, CornerSpray } from './Flourish'
+import { PressedBotanicals, SprigRow } from './Botanicals'
 import { VENUE, ADDR, DATE_LABEL, DAY_LABEL, TIME_LABEL, wazeUrl, gmapsUrl, gcalUrl, icsUrl } from '@/lib/wedding'
 
 function Pin() {
@@ -30,11 +31,13 @@ function Pin() {
 export default function Venue() {
   const rm = useReducedMotion()
   return (
-    <section className="text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(44px, 6.5vh, 68px) 22px' })}>
+    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(44px, 6.5vh, 68px) 22px' })}>
+      <PressedBotanicals set="venue" />
       <div className="mx-auto" style={{ maxWidth: '46rem' }}>
       <FadeUp>
         <Flourish color="#8fa3e8" />
         <Eyebrow>Getting There</Eyebrow>
+        <SprigRow color="#8fa3e8" />
       </FadeUp>
       <FadeUp delay={0.08}>
         <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '14px 0 26px', color: 'var(--champ2)' }}>

@@ -3,10 +3,12 @@ import { SparklesText } from '@/components/vendor/sparkles-text'
 import { VENUE, ADDR, DATE_LABEL } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, CornerSpray } from './Flourish'
+import { PressedBotanicals } from './Botanicals'
 
 export default function Finale() {
   return (
     <footer className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: '48px 20px 100px' })}>
+      <PressedBotanicals set="finale" />
       <div className="absolute pointer-events-none" style={{ bottom: 8, insetInlineStart: 8, opacity: 0.85 }} aria-hidden="true">
         <CornerSpray size={76} flipY />
       </div>
@@ -57,6 +59,23 @@ export default function Finale() {
             {VENUE} · {ADDR}
           </span>
         </div>
+        {/* קרדיט לסילואטים הבוטניים — נדרש ברישיון CC BY 3.0 */}
+        <p
+          dir="ltr"
+          style={{
+            marginTop: 14,
+            color: 'var(--muted)',
+            opacity: 0.5,
+            fontSize: '0.62rem',
+            letterSpacing: '0.06em',
+          }}
+        >
+          Botanical silhouettes:{' '}
+          <a href="https://game-icons.net" target="_blank" rel="noopener" style={{ color: 'inherit' }}>
+            game-icons.net
+          </a>{' '}
+          · CC BY 3.0
+        </p>
       </FadeUp>
     </footer>
   )

@@ -8,6 +8,7 @@ import { HyperText, DIGITS_SET } from '@/components/vendor/hyper-text'
 import { FlickerText } from '@/components/vendor/flicker-text'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { MiniDiscoBall, SideVine } from './Flourish'
+import { PressedBotanicals } from './Botanicals'
 import { COUPLE, ADDR, VENUE, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
 
 const MARQ = 'SHACHAF & TOMER — 28 . 10 . 2026 — TEL AVIV — '
@@ -39,6 +40,7 @@ export default function Hero() {
       className="relative flex flex-col items-center justify-center text-center overflow-hidden"
       style={flavorStyle(FLAVORS.blossom, { minHeight: '100dvh', padding: '48px 20px 96px' })}
     >
+      <PressedBotanicals set="hero" />
       {!rm && <Particles className="absolute inset-0" quantity={80} color="#c4768f" ease={70} staticity={40} size={0.5} />}
       {!rm && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
