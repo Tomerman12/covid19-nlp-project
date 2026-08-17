@@ -18,8 +18,14 @@ import { COUPLE, DATE_LABEL } from '@/lib/wedding'
  * ------------------------------------------------------------------------- */
 
 const PULL_FRAMES = 24
-const MEDIA = 'media/'
-const frameSrc = (i: number) => `${MEDIA}pull/${String(i + 1).padStart(2, '0')}.jpg`
+
+/**
+ * נתיבי קבצי המכונה. כברירת מחדל הם יחסיים ל-`index.html`; גרסת התצוגה
+ * המוטמעת (עמוד יחיד בלי קבצים לצידו) מזריקה מפה של data-URI במקומם.
+ */
+const inlined: Record<string, string> | undefined = (window as any).__WEDDING_MEDIA__
+const media = (name: string) => inlined?.[name] ?? `media/${name}`
+const frameSrc = (i: number) => media(`pull/${String(i + 1).padStart(2, '0')}.jpg`)
 
 const W = 960
 const H = 720
@@ -384,7 +390,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
             ref={videoRef}
             className="slot-media"
             style={{ opacity: phase === 'pull' ? 0 : 1 }}
-            poster={`${MEDIA}poster.jpg`}
+            poster={media('poster.jpg')}
             preload="auto"
             muted
             playsInline
@@ -393,8 +399,8 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
             aria-hidden="true"
           >
             {/* VP9 קטן יותר ומתנגן בכל דפדפן מודרני; ה-mp4 הוא הרשת הביטחון לספארי ותיק */}
-            <source src={`${MEDIA}machine.webm`} type="video/webm" />
-            <source src={`${MEDIA}machine.mp4`} type="video/mp4" />
+            <source src={media('machine.webm')} type="video/webm" />
+            <source src={media('machine.mp4')} type="video/mp4" />
           </video>
         </button>
       </div>
