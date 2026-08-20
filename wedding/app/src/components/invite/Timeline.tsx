@@ -4,7 +4,8 @@ import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, GarlandDivider } from './Flourish'
 import { PressedBotanicals, SprigRow, TimeSprig } from './Botanicals'
 
-/* the dots stay multicolored ELEMENTS; the type is unified rose */
+/* the dots stay multicolored ELEMENTS; the rail they sit on is one colour */
+const RAIL = '#d9769b'
 const DOT_COLORS = ['#d9769b', '#7f9c5e', '#8fa3e8']
 const DOT_GLOWS = ['rgba(217,118,155,.4)', 'rgba(127,156,94,.4)', 'rgba(143,163,232,.4)']
 
@@ -36,8 +37,8 @@ export default function Timeline() {
             insetInlineEnd: '16.66%',
             height: 2,
             borderRadius: 2,
-            background: `linear-gradient(to left, ${DOT_COLORS[0]}, ${DOT_COLORS[1]}, ${DOT_COLORS[2]})`,
-            opacity: 0.65,
+            background: RAIL,
+            opacity: 0.55,
           }}
         />
         <ol

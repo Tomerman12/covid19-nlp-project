@@ -145,28 +145,53 @@ if __name__ == "__main__":
         write_png(OUT / "pull" / f"{i+1:02d}.png", rgba[CY0:CY1, CX0:CX1])
     meta["pullFrames"] = len(pull)
 
-    # ---- lit frame: same pose, bulbs on. Scale-match it to the pull frames,
-    #      because the camera creeps in slowly across the clip.
+    # ---- lit frame: same pose, bulbs on. The camera creeps in across the clip,
+    #      so it has to be registered onto the pull frames or the machine visibly
+    #      changes size the instant the reels lock — which reads as a cut.
+    #      Registering on the SILHOUETTES sidesteps the bulbs, which are the one
+    #      thing that legitimately differs between the two frames.
     lit = frames(LIT_T, LIT_T + 1 / 24)[0]
     lit_rgba, _ = cut(lit)
-    lx0, lx1, ly0, ly1 = machine_box(lit_rgba[..., 3] / 255)
-    scale = (bx1 - bx0) / (lx1 - lx0)
-    print(f"lit frame is {1/scale:.3f}x the pull frames — rescaling to match")
-    zoom = ndimage.zoom(lit_rgba, (scale, scale, 1), order=1)
-    # line the two up on the machine's centre
-    zx0, zx1, zy0, zy1 = machine_box(zoom[..., 3] / 255)
-    dx = int(round(((bx0 + bx1) - (zx0 + zx1)) / 2))
-    dy = int(round(((by0 + by1) - (zy0 + zy1)) / 2))
-    canvas = np.zeros((H, W, 4))
-    # paste `zoom` shifted by (dx, dy), clipped to the canvas on both sides
-    sy0, sx0 = max(0, -dy), max(0, -dx)
-    dy0, dx0 = max(0, dy), max(0, dx)
-    h = min(zoom.shape[0] - sy0, H - dy0)
-    w = min(zoom.shape[1] - sx0, W - dx0)
-    canvas[dy0:dy0 + h, dx0:dx0 + w] = zoom[sy0:sy0 + h, sx0:sx0 + w]
-    cbx = machine_box(canvas[..., 3] / 255)
-    print(f"  lit aligned to x {cbx[0]}..{cbx[1]} y {cbx[2]}..{cbx[3]} "
-          f"(pull is x {bx0}..{bx1} y {by0}..{by1})")
+    ref_mask = rest_rgba[..., 3] > 128
+    lit_mask = lit_rgba[..., 3] > 128
+
+    def place(arr, scale, dx, dy):
+        """Scale about the origin, then shift, into a frame-sized canvas."""
+        z = ndimage.zoom(arr, (scale, scale) + ((1,) if arr.ndim == 3 else ()), order=1)
+        out = np.zeros_like(arr, dtype=float)
+        sy, sx = max(0, -dy), max(0, -dx)
+        ty, tx = max(0, dy), max(0, dx)
+        h = min(z.shape[0] - sy, out.shape[0] - ty)
+        w = min(z.shape[1] - sx, out.shape[1] - tx)
+        if h > 0 and w > 0:
+            out[ty:ty + h, tx:tx + w] = z[sy:sy + h, sx:sx + w]
+        return out
+
+    def centroid(m):
+        ys, xs = np.nonzero(m)
+        return xs.mean(), ys.mean()
+
+    rcx, rcy = centroid(ref_mask)
+    best = None
+    for scale in np.linspace(0.965, 1.035, 57):
+        zm = ndimage.zoom(lit_mask.astype(float), scale, order=1) > 0.5
+        if not zm.any():
+            continue
+        zcx, zcy = centroid(zm)
+        for ddx in (-2, -1, 0, 1, 2):
+            for ddy in (-2, -1, 0, 1, 2):
+                dx = int(round(rcx - zcx)) + ddx
+                dy = int(round(rcy - zcy)) + ddy
+                cand = place(lit_mask.astype(float), scale, dx, dy) > 0.5
+                err = int(np.logical_xor(cand, ref_mask).sum())
+                if best is None or err < best[0]:
+                    best = (err, scale, dx, dy)
+    err, scale, dx, dy = best
+    print(f"lit registered: scale {scale:.4f} shift ({dx},{dy}) — "
+          f"{err} px differ from the rest frame silhouette "
+          f"({err / max(ref_mask.sum(), 1) * 100:.2f}%)")
+
+    canvas = place(lit_rgba, scale, dx, dy)
     canvas[WIN["y0"]:WIN["y1"], WIN["x0"]:WIN["x1"], 3] = 0
     write_png(OUT / "lit.png", canvas[CY0:CY1, CX0:CX1])
 

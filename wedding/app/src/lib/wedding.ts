@@ -1,7 +1,7 @@
 export const COUPLE = { one: 'שחף', two: 'תומר', full: 'שחף טורטלטאוב · תומר מן' }
 export const COUPLE_EN = { one: 'Shachaf', two: 'Tomer' }
 export const VENUE = 'אולם אביגדור'
-export const ADDR = 'בן אביגדור 24, תל אביב'
+export const ADDR = 'בן אביגדור 22, תל אביב'
 export const DATE_LABEL = '28.10.2026'
 export const DAY_LABEL = 'יום רביעי'
 export const TIME_LABEL = '19:30'

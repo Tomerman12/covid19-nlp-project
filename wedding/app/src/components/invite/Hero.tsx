@@ -9,7 +9,7 @@ import { FlickerText } from '@/components/vendor/flicker-text'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { MiniDiscoBall, SideVine } from './Flourish'
 import { PressedBotanicals } from './Botanicals'
-import { COUPLE, ADDR, VENUE, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
+import { COUPLE, COUPLE_EN, ADDR, VENUE, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
 
 const MARQ = 'SHACHAF & TOMER — 28 . 10 . 2026 — TEL AVIV — '
 
@@ -110,17 +110,19 @@ export default function Hero() {
 
         <h1
           className="font-display flex items-center justify-center flex-wrap"
+          dir="ltr"
           style={{
             fontWeight: 900,
-            fontSize: 'clamp(3.4rem, 16vw, 8.6rem)',
+            /* Latin sets much wider than the Hebrew this was sized for */
+            fontSize: 'clamp(2.5rem, 11vw, 6.2rem)',
             lineHeight: 1.08,
             color: 'var(--ivory)',
-            gap: '0.16em',
+            gap: '0.26em',   /* Latin needs more air around the ampersand than Hebrew did */
             margin: '10px 0 4px',
             textShadow: '0 0 60px rgba(196,118,143,.28)',
           }}
         >
-          <FlickerText delay={250} duration={1400}>{COUPLE.one}</FlickerText>
+          <FlickerText delay={250} duration={1400}>{COUPLE_EN.one}</FlickerText>
           <motion.span
             className="font-script"
             dir="ltr"
@@ -132,7 +134,7 @@ export default function Hero() {
           >
             &amp;
           </motion.span>
-          <FlickerText delay={550} duration={1400}>{COUPLE.two}</FlickerText>
+          <FlickerText delay={550} duration={1400}>{COUPLE_EN.two}</FlickerText>
         </h1>
 
         <motion.p
