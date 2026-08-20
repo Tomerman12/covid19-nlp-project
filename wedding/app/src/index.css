@@ -455,36 +455,47 @@ body.locked {
   color: var(--champ);
 }
 
-/* התמונה: מסגרת רכה עם צל, כמו צילום שהודבק על ההזמנה */
+/* המכונה: תמונה חתוכה מהרקע שלה, יושבת ישירות על הנייר — בלי מסגרת,
+   בלי מלבן, בלי רקע משלה. הצל נבנה כאן ב-CSS ולא נלקח מהקליפ, כדי
+   שיהיה נקי ובצבע הנכון על הקרם. */
 .slot-stage {
   position: relative;
   flex: 0 0 auto;
   width: 100%;
-  /* קצת יותר גבוה מהקליפ עצמו, כדי שהמכונה תמלא את המסך.
-     object-fit חותך 30px מכל צד — נמדד מול המצב הצר ביותר בקליפ (רגע
-     המשיכה המלאה, שבו כדור הידית מגיע ל-x=913 מתוך 960) ונשאר בשוליים. */
-  aspect-ratio: 5 / 4;
+  max-width: 340px;
+  aspect-ratio: 484 / 660;
   padding: 0;
   border: 0;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #a49a82;
-  box-shadow:
-    0 1px 0 rgba(255, 253, 244, 0.6),
-    0 18px 44px -14px rgba(87, 80, 58, 0.5);
+  background: none;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-.slot-media {
+.slot-ground {
   position: absolute;
+  left: 8%;
+  right: 12%;
+  bottom: 1.5%;
+  height: 5%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(87, 80, 58, 0.34), rgba(87, 80, 58, 0));
+  filter: blur(3px);
+}
+.slot-reels,
+.slot-machine {
+  position: absolute;
+  display: block;
+}
+.slot-reels {
+  /* המיקום מגיע מהקומפוננטה — זה בדיוק החור שנוקב בתמונת המכונה */
+  border-radius: 3px;
+}
+.slot-machine {
   inset: 0;
   width: 100%;
   height: 100%;
-  display: block;
-  object-fit: cover;
-  transition: opacity 0.12s linear;
+  filter: drop-shadow(0 10px 14px rgba(87, 80, 58, 0.18));
 }
 
 /* השורה שמתחת לתמונה: ההנחיה לפני, התאריך אחרי — באותו גובה, בלי קפיצה */
