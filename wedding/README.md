@@ -86,10 +86,46 @@ Hero, Message, Countdown, Timeline, Venue, Finale, מצב מסיבה וקונפ�
 
 ## איך מעלים לאוויר
 
-הכול סטטי, אז כל אחסון סטטי יעבוד. הכי פשוט — GitHub Pages:
-Settings → Pages → Source: `Deploy from a branch`, והכתובת תהיה
-`https://<user>.github.io/<repo>/wedding/`.
+האתר סטטי לגמרי — אין שרת, אין build בזמן העלאה. מה שצריך לעלות זה **`index.html`
+ו-`media/` בלבד**, באותה תיקייה. `.vercelignore` כבר דואג לזה.
 
-מעלים **גם את `index.html` וגם את `media/`**, ב-`media/` שיושב לצד `index.html`.
-בלי `media/` המכונה לא תופיע — הדף עצמו יעבוד, יראה את התאריך ויעבור להזמנה, אבל
-בלי הרגע של המשיכה.
+### Vercel (מומלץ)
+
+בדשבורד: **Add New → Project**, לבחור את הריפו, ואז:
+
+| הגדרה | ערך |
+|---|---|
+| **Root Directory** | `wedding` ← **חובה.** שורש הריפו הוא פרויקט אחר לגמרי |
+| Framework Preset | `Other` |
+| Build Command | להשאיר ריק (אין `package.json` ב-`wedding/`, אז Vercel מגיש סטטי) |
+| Output Directory | להשאיר ריק |
+
+**שימו לב לענף.** Vercel מפרסם ל-production את ענף ברירת המחדל בלבד. אם העבודה
+יושבת על ענף אחר, או שממזגים אותו ל-main, או ש-Settings → Git → Production Branch
+מוגדר לענף הזה. אחרת ה-URL הראשי יראה משהו אחר, וההזמנה תהיה רק בכתובת ה-Preview.
+
+מכאן כל `git push` לענף הזה מפרסם מחדש לבד.
+
+### או משורת הפקודה
+
+```bash
+cd wedding
+npx vercel            # תצוגה מקדימה
+npx vercel --prod     # פרסום
+```
+
+מהתיקייה `wedding/`, כך ש-`.vercelignore` תופס. אין צורך להגדיר Root Directory.
+
+### מה שולט בקאשינג
+
+`vercel.json` נותן ל-`media/` יממה של קאש עם `stale-while-revalidate` שבוע,
+ול-`index.html` אפס. הקבצים ב-`media/` הם בשמות קבועים ולא בשמות עם hash, אז
+**אם מחליפים את תמונות המכונה, יכול לקחת עד יממה עד שגולש חוזר יראה את החדשות.**
+מי שרוצה החלפה מיידית — לשנות את שם התיקייה (`machine` → `machine2`) ואת
+`media(...)` ב-`SlotIntro.tsx`.
+
+### GitHub Pages, אם בא לכם בלי Vercel
+
+Settings → Pages → Source: `Deploy from a branch`, והכתובת תהיה
+`https://<user>.github.io/<repo>/wedding/`. מעלים גם את `index.html` וגם את
+`media/`.
