@@ -18,7 +18,7 @@ H, W = 720, 1280
 # the ivory drum faces, measured off the frame — this becomes a transparent hole
 WIN = dict(x0=526, x1=755, y0=261, y1=409)
 # the machine, lever included, never moves outside this box
-MBOX = (468, 50, 888, 650)
+MBOX = (470, 44, 892, 658)   # the base sits at ~y=650; leave it room or it slices flat
 # the lever swings down over these source frames
 PULL_FROM, PULL_TO = 14 / 24, 26 / 24
 LIT_T = 6.25            # bulbs on, lever back at rest, before the confetti arrives
@@ -80,8 +80,9 @@ def cut(f):
         solid = lab == (int(np.argmax(sizes)) + 1)
     solid = ndimage.binary_fill_holes(solid)
 
-    alpha = ndimage.gaussian_filter(solid.astype(float), 1.1)
-    alpha = np.clip((alpha - 0.34) / 0.40, 0, 1)
+    # a soft, slightly generous edge — a hard one reads as a sticker
+    alpha = ndimage.gaussian_filter(solid.astype(float), 1.5)
+    alpha = np.clip((alpha - 0.20) / 0.55, 0, 1)
 
     # shadow = how much darker than the predicted backdrop, outside the machine
     ratio = np.clip(f.sum(2) / np.maximum(pred.sum(2), 1), 0, 1)
@@ -122,9 +123,10 @@ def write_png(path, arr):
 
 
 if __name__ == "__main__":
-    # ---- the pull, motion-interpolated so 12 source frames become ~25 steps
+    # ---- the pull, motion-interpolated: 12 source frames become ~36 steps, so
+    #      a slow drag doesn't step visibly from one lever position to the next
     pull = frames(PULL_FROM, PULL_TO,
-                  "minterpolate=fps=48:mi_mode=mci:mc_mode=aobmc:vsbmc=1")
+                  "minterpolate=fps=72:mi_mode=mci:mc_mode=aobmc:vsbmc=1")
     print(f"pull frames decoded: {len(pull)}")
 
     rest_rgba, rest_shadow = cut(pull[0])

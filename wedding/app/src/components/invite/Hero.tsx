@@ -38,7 +38,7 @@ export default function Hero() {
   return (
     <header
       className="relative flex flex-col items-center justify-center text-center overflow-hidden"
-      style={flavorStyle(FLAVORS.blossom, { minHeight: '100dvh', padding: '48px 20px 96px' })}
+      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(100dvh, 640px)', padding: '36px 20px 44px' })}
     >
       <PressedBotanicals set="hero" />
       {!rm && <Particles className="absolute inset-0" quantity={80} color="#c4768f" ease={70} staticity={40} size={0.5} />}

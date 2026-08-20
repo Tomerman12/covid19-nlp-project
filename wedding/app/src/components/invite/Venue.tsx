@@ -31,7 +31,7 @@ function Pin() {
 export default function Venue() {
   const rm = useReducedMotion()
   return (
-    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(44px, 6.5vh, 68px) 22px' })}>
+    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(26px, 3.4vh, 40px) 22px' })}>
       <PressedBotanicals set="venue" />
       <div className="mx-auto" style={{ maxWidth: '46rem' }}>
       <FadeUp>
@@ -51,7 +51,7 @@ export default function Venue() {
           style={{
             border: '1px solid var(--line)',
             background: 'linear-gradient(180deg, #fffdf4, #f9f2df)',
-            padding: 'clamp(30px, 6vw, 48px)',
+            padding: 'clamp(22px, 4.4vw, 34px)',
             boxShadow: '0 20px 48px rgba(140,110,50,.16)',
           }}
         >

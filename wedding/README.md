@@ -39,7 +39,7 @@ cp dist/index.html ../index.html
 
 | קובץ | מה זה |
 |---|---|
-| `media/machine/pull/01..21.webp` | הידית, פריים לכל שלב במשיכה |
+| `media/machine/pull/01..31.webp` | הידית, פריים לכל שלב במשיכה |
 | `media/machine/lit.webp` | אותה תנוחה, עם הנורות דולקות |
 | `media/machine/meta.json` | מידות התמונה ומיקום החור של חלון הגלגלים |
 

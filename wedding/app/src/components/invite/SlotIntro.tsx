@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { COUPLE, DATE_LABEL } from '@/lib/wedding'
+import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
 import { createReels, type Reels } from '@/lib/reels'
 
 /* ---------------------------------------------------------------------------
@@ -9,7 +9,7 @@ import { createReels, type Reels } from '@/lib/reels'
  * המכונה היא צילום — רינדור פוטוריאליסטי שנוצר ב-Veo — אבל **לא סרטון**. היא
  * נחתכה מהרקע שלה לתמונות עם שקיפות, וחלון הגלגלים נוקב בהן. כך:
  *
- *   media/machine/pull/01..21.webp   הידית, פריים לכל שלב במשיכה
+ *   media/machine/pull/01..31.webp   הידית, פריים לכל שלב במשיכה
  *   media/machine/lit.webp           אותה תנוחה, עם הנורות דולקות
  *
  * הידית עוקבת אחרי האצבע אחת־לאחת, והגלגלים מצוירים בקוד מתחת לחור — כלומר
@@ -20,13 +20,13 @@ import { createReels, type Reels } from '@/lib/reels'
 const inlined: Record<string, string> | undefined = (window as any).__WEDDING_MEDIA__
 const media = (name: string) => inlined?.[name] ?? `media/${name}`
 
-const PULL_FRAMES = 21
+const PULL_FRAMES = 31
 const frameSrc = (i: number) => media(`machine/pull/${String(i + 1).padStart(2, '0')}.webp`)
 
 /* המידות של תמונות המכונה, וחלון הגלגלים בתוכן (מ-meta.json של הפריקה) */
-const IMG_W = 484
-const IMG_H = 660
-const WIN = { x: 98, y: 232, w: 229, h: 148 }
+const IMG_W = 482
+const IMG_H = 668
+const WIN = { x: 96, y: 232, w: 229, h: 148 }
 const pct = (v: number, total: number) => `${(v / total) * 100}%`
 
 /** כמה פיקסלים של גרירה שווים משיכה מלאה */
@@ -352,8 +352,8 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
           <p className="slot-eyebrow font-serif2 italic" dir="ltr">
             the wedding of
           </p>
-          <h1 className="slot-names font-display">
-            {COUPLE.one} <span className="font-script slot-amp">&amp;</span> {COUPLE.two}
+          <h1 className="slot-names font-script" dir="ltr">
+            {COUPLE_EN.one} <span className="slot-amp">&amp;</span> {COUPLE_EN.two}
           </h1>
         </header>
 

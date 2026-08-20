@@ -13,7 +13,7 @@ export default function Message() {
       <div className="absolute pointer-events-none" style={{ top: 10, insetInlineEnd: 8, opacity: 0.85 }} aria-hidden="true">
         <CornerSpray size={72} flip />
       </div>
-      <div className="mx-auto text-center" style={{ maxWidth: '44rem', padding: 'clamp(44px, 6.5vh, 68px) 24px' }}>
+      <div className="mx-auto text-center" style={{ maxWidth: '44rem', padding: 'clamp(26px, 3.4vh, 40px) 24px' }}>
         <FadeUp>
           <Flourish color="#8fa3e8" />
           <Eyebrow ink>You&rsquo;re Invited</Eyebrow>
@@ -51,22 +51,6 @@ export default function Message() {
         </div>
 
         <FadeUp delay={0.15}>
-          <p
-            className="font-serif2 italic"
-            dir="ltr"
-            style={{ color: 'var(--champ2)', fontSize: 'clamp(1.3rem, 4.4vw, 1.7rem)', letterSpacing: '0.06em', margin: '34px 0 0' }}
-          >
-            — forever starts here —
-          </p>
-        </FadeUp>
-
-        <FadeUp delay={0.25}>
-          <p className="font-script" dir="ltr" style={{ fontSize: 'clamp(2.3rem, 8vw, 3.1rem)', color: 'var(--ink)', margin: '26px 0 0' }}>
-            Shachaf &amp; Tomer
-          </p>
-        </FadeUp>
-
-        <FadeUp delay={0.3}>
           <GarlandDivider />
         </FadeUp>
       </div>

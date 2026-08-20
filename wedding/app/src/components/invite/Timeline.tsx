@@ -11,7 +11,7 @@ const DOT_GLOWS = ['rgba(217,118,155,.4)', 'rgba(127,156,94,.4)', 'rgba(143,163,
 /** horizontal schedule — the whole evening in one row */
 export default function Timeline() {
   return (
-    <section className="relative" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(40px, 6vh, 64px) 18px' })}>
+    <section className="relative" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(24px, 3.2vh, 38px) 18px' })}>
       <PressedBotanicals set="timeline" />
       <div className="mx-auto" style={{ maxWidth: '56rem' }}>
       <div className="text-center">
