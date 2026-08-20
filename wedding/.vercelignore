@@ -1,0 +1,4 @@
+# רק index.html ו-media/ צריכים לעלות. השאר הוא קוד מקור וכלים.
+app/
+tools/
+README.md
