@@ -18,6 +18,7 @@ Two things come out, and they are pixel-aligned because they share this crop:
 Usage:
     MACHINE_CLIP=/path/to/clip.mp4 python3 tools/build_machine.py
 """
+import hashlib
 import json
 import os
 import pathlib
@@ -246,13 +247,32 @@ def main():
     for name in enc:
         print(f"    {name}: {(OUT / name).stat().st_size / 1024:.0f} KB")
 
+    # A fingerprint of what was just written, stamped onto every media URL.
+    # The filenames themselves never change, so without this a browser holding
+    # yesterday's cache shows yesterday's machine inside today's page — which
+    # looks like a bug in the site rather than a stale file.
+    digest = hashlib.sha1()
+    for f in sorted(OUT.rglob("*")):
+        if f.is_file() and f.suffix != ".json":
+            digest.update(f.read_bytes())
+    version = digest.hexdigest()[:10]
+
     (OUT / "meta.json").write_text(json.dumps({
+        "version": version,
         "size": [cw, ch],
         "pullFrames": len(pull),
         "videoStartsAtSourceT": PULL_TO,
         "videoFrames": n,
         "videoDuration": round(n / 24, 3),
     }, indent=2))
+
+    ts = OUT.parent.parent / "app" / "src" / "lib" / "machineVersion.ts"
+    ts.write_text(
+        "/* Written by tools/build_machine.py — do not edit.\n"
+        " * Stamped onto the media URLs so a rebuild can never be served from a\n"
+        " * stale cache under the same filenames. */\n"
+        f"export const MACHINE_VERSION = '{version}'\n", encoding="utf-8")
+    print(f"  version {version} -> {ts.relative_to(OUT.parent.parent)}")
     for stale in ("lit.webp", "lit.png", "shadow.png"):
         (OUT / stale).unlink(missing_ok=True)
 
