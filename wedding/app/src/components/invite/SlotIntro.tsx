@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
-import { createReels, type Reels } from '@/lib/reels'
 
 /* ---------------------------------------------------------------------------
  * מסך הפתיחה: מכונת המזל.
  *
- * המכונה היא צילום — רינדור פוטוריאליסטי שנוצר ב-Veo — אבל **לא סרטון**. היא
- * נחתכה מהרקע שלה לתמונות עם שקיפות, וחלון הגלגלים נוקב בהן. כך:
+ * המכונה היא רינדור פוטוריאליסטי שנוצר ב-Veo, והתנועה שרואים היא **התנועה
+ * האמיתית מהקליפ** — הידית שחוזרת, הנורות שנדלקות בזו אחר זו, התופים שנתפסים
+ * אחד־אחד, הקונפטי. אין טעם להמציא את זה מחדש בקוד; הבעיה הייתה תמיד רק
+ * המלבן שהקליפ הגיע בתוכו.
  *
- *   media/machine/pull/01..31.webp   הידית, פריים לכל שלב במשיכה
- *   media/machine/lit.webp           אותה תנוחה, עם הנורות דולקות
+ * לכן כל פריים נגזר מרקע האולפן והורכב על **בדיוק הקרם של העמוד**, יחד עם הצל
+ * של המכונה עצמה. מה שיוצא הוא מדיה אטומה רגילה שהרקע שלה *הוא* העמוד: בלי
+ * ערוץ אלפא, בלי קודק מיוחד, ובלי מסגרת שנראית.
  *
- * הידית עוקבת אחרי האצבע אחת־לאחת, והגלגלים מצוירים בקוד מתחת לחור — כלומר
- * הסיבוב אמיתי: כל אורך, כל מהירות, ואפשר לזרז אותו באמצע. אין וידאו, אין
- * מסגרת, והמכונה יושבת ישירות על נייר הקרם של ההזמנה.
+ *   media/machine/pull/01..31.webp   הידית יורדת, פריים לכל שלב
+ *   media/machine/spin.webm|.mp4     מרגע השחרור: הסיבוב, הנעילה, הקונפטי
+ *
+ * שני החלקים חתוכים באותו crop וממשיכים זה את זה על אותו פריים בדיוק.
  * ------------------------------------------------------------------------- */
 
 const inlined: Record<string, string> | undefined = (window as any).__WEDDING_MEDIA__
@@ -23,44 +26,33 @@ const media = (name: string) => inlined?.[name] ?? `media/${name}`
 const PULL_FRAMES = 31
 const frameSrc = (i: number) => media(`machine/pull/${String(i + 1).padStart(2, '0')}.webp`)
 
-/* המידות של תמונות המכונה, וחלון הגלגלים בתוכן (מ-meta.json של הפריקה) */
-const IMG_W = 482
-const IMG_H = 668
-const WIN = { x: 96, y: 232, w: 229, h: 148 }
-const pct = (v: number, total: number) => `${(v / total) * 100}%`
+/* ציוני הדרך בתוך spin.webm (שניות) — נמדדו מהקליפ החתוך עצמו */
+const T_STOP = [2.78, 3.42, 4.42] // שלושת התופים נתפסים
+const T_REVEAL = 4.85 // הגלגלים נעולים על 28 · 10 · 26
+const T_HANDOFF = 6.5 // עוברים להזמנה בזמן שהקונפטי יורד
 
 /** כמה פיקסלים של גרירה שווים משיכה מלאה */
 const TRAVEL = 118
 /** מתחת לזה זו נגיעה, לא גרירה */
 const TAP_SLOP = 8
-/** כמה זמן התאריך נשאר על המסך לפני שההזמנה נפתחת */
-const HOLD_MS = 1900
 
 type Phase = 'pull' | 'spinning' | 'revealed'
 
 export default function SlotIntro({ onDone }: { onDone: () => void }) {
   const machineRef = useRef<HTMLCanvasElement | null>(null)
-  const reelsRef = useRef<HTMLCanvasElement | null>(null)
-  const reels = useRef<Reels | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const framesRef = useRef<HTMLImageElement[]>([])
-  const litRef = useRef<HTMLImageElement | null>(null)
   const audioRef = useRef<AudioContext | null>(null)
   const timersRef = useRef<number[]>([])
   const rafRef = useRef<number>(0)
   const doneRef = useRef(false)
   const revealedRef = useRef(false)
-  const rigRef = useRef<HTMLDivElement | null>(null)
-  /** רעידת המכונה בזמן שהגלגלים מסתובבים */
-  const shake = useRef({ amp: 0, t: 0 })
-  /** הבהוב הנורות בזמן הסיבוב, לפני שהן נדלקות לגמרי */
-  const flicker = useRef(0)
 
   const later = (fn: () => void, ms: number) => {
     timersRef.current.push(window.setTimeout(fn, ms))
   }
 
   const pull = useRef(0) // 0 = מנוחה, 1 = משוכה עד הסוף
-  const litMix = useRef(0) // 0 = נורות כבויות, 1 = דולקות
   const shownFrame = useRef(-1)
   const lastTickFrame = useRef(0)
   const anim = useRef<{ from: number; to: number; t0: number; dur: number; then?: () => void } | null>(null)
@@ -101,62 +93,39 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     }
   }
 
-  /* ---------- ציור המכונה עצמה ---------- */
-  const sizeMachine = useCallback(() => {
+  /* ---------- ציור פריים המשיכה ---------- */
+  const sizeCanvas = useCallback(() => {
     const c = machineRef.current
     if (!c) return
     const dpr = Math.min(window.devicePixelRatio || 1, 3)
     const r = c.getBoundingClientRect()
-    c.width = Math.max(1, Math.round(r.width * dpr))
-    c.height = Math.max(1, Math.round(r.height * dpr))
+    if (!r.width) return
+    c.width = Math.round(r.width * dpr)
+    c.height = Math.round(r.height * dpr)
     shownFrame.current = -1
   }, [])
 
-  const paintMachine = useCallback(
-    (force = false) => {
-      const c = machineRef.current
-      if (!c || !c.width) return
-      const i = Math.max(0, Math.min(PULL_FRAMES - 1, Math.round(rubber(pull.current) * (PULL_FRAMES - 1))))
-      if (i === shownFrame.current && !force) return
-      const img = framesRef.current[i]
-      if (!img?.complete || !img.naturalWidth) return
-      const ctx = c.getContext('2d')!
-      ctx.clearRect(0, 0, c.width, c.height)
-      ctx.drawImage(img, 0, 0, c.width, c.height)
-      const lit = litRef.current
-      if (lit?.complete) {
-        if (litMix.current > 0) {
-          ctx.globalAlpha = litMix.current
-          ctx.drawImage(lit, 0, 0, c.width, c.height)
-          ctx.globalAlpha = 1
-        } else if (flicker.current > 0) {
-          // רק קשת הנורות מהבהבת בזמן הסיבוב. הפריים המואר צולם בשנייה אחרת
-          // בקליפ, אז הוא בהיר ב-25% *בכל* הגוף — בלי החיתוך הזה כל המכונה
-          // הייתה פועמת בבהירות במקום הנורות.
-          ctx.save()
-          ctx.beginPath()
-          ctx.rect(c.width * 0.05, c.height * 0.09, c.width * 0.9, c.height * 0.22)
-          ctx.clip()
-          ctx.globalAlpha = flicker.current
-          ctx.drawImage(lit, 0, 0, c.width, c.height)
-          ctx.restore()
-        }
-      }
-      if (i !== shownFrame.current && Math.abs(i - lastTickFrame.current) >= 3) {
-        lastTickFrame.current = i
-        tick(660 + i * 12, 0.028, 0.035) // רַצֶ'ט
-      }
-      shownFrame.current = i
-    },
-    [tick],
-  )
+  const paint = useCallback(() => {
+    const c = machineRef.current
+    if (!c || !c.width) return
+    const i = Math.max(0, Math.min(PULL_FRAMES - 1, Math.round(rubber(pull.current) * (PULL_FRAMES - 1))))
+    if (i === shownFrame.current) return
+    const img = framesRef.current[i]
+    if (!img?.complete || !img.naturalWidth) return
+    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height)
+    if (Math.abs(i - lastTickFrame.current) >= 3) {
+      lastTickFrame.current = i
+      tick(660 + i * 12, 0.028, 0.035) // רַצֶ'ט
+    }
+    shownFrame.current = i
+  }, [tick])
 
   const setPull = useCallback(
     (p: number) => {
       pull.current = p
-      paintMachine()
+      paint()
     },
-    [paintMachine],
+    [paint],
   )
 
   const animateTo = (to: number, dur: number, then?: () => void) => {
@@ -176,36 +145,42 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     setPhase('revealed')
     tick(320, 0.06, 0.25)
     buzz([18, 60, 18])
-    flicker.current = 0
-    shake.current.amp += 2.8 // the final thunk as the last drum seats
-    // הנורות נדלקות ברגע שהתאריך נעול
-    const t0 = performance.now()
-    const glow = () => {
-      const k = Math.min((performance.now() - t0) / 420, 1)
-      litMix.current = k
-      paintMachine(true)
-      if (k < 1) requestAnimationFrame(glow)
-    }
-    glow()
-    later(handoff, HOLD_MS)
-  }, [handoff, paintMachine, tick])
+  }, [tick])
 
-  const startSpin = useCallback(
-    (power: number) => {
-      setPhase('spinning')
-      buzz(24)
-      shake.current = { amp: 2.6, t: 0 } // the whole cabinet starts to shudder
-      reels.current?.start(power)
+  /** נפילה חזרה לתמונה דוממת: מציגים את התאריך ועוברים הלאה */
+  const staticFinish = useCallback(
+    (delay = 240) => {
+      later(reveal, delay)
+      later(handoff, delay + 2400)
     },
-    [],
+    [handoff, reveal],
   )
 
-  /* ---------- לולאה אחת לכל התנועה ---------- */
+  /* ---------- השחרור: הקליפ ממשיך מהפריים שבו האצבע עצרה ---------- */
+  const startSpin = useCallback(() => {
+    const v = videoRef.current
+    setPhase('spinning')
+    buzz(24)
+    if (!v) {
+      staticFinish()
+      return
+    }
+    v.currentTime = 0
+    v.playbackRate = 1
+    void v.play().catch(() => {})
+    // רשת ביטחון אחת לכל התקלות: קודק חסר, רשת שנפלה, נגינה שנחסמה
+    later(() => {
+      const el = videoRef.current
+      if (!el || el.paused || el.currentTime < 0.1) staticFinish(0)
+    }, 900)
+  }, [staticFinish])
+
+  /* ---------- לולאה אחת: אנימציית הידית + מעקב אחרי זמן הקליפ ---------- */
   useEffect(() => {
-    let last = performance.now()
+    let stopped = false
+    let cue = 0
     const loop = (now: number) => {
-      const dt = Math.min(now - last, 250)
-      last = now
+      if (stopped) return
       const a = anim.current
       if (a) {
         const k = Math.min((now - a.t0) / a.dur, 1)
@@ -215,115 +190,61 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
           a.then?.()
         }
       }
-      reels.current?.step(dt)
-
-      // המכונה עצמה חיה כל עוד הגלגלים מסתובבים — אחרת זה נראה כמו
-      // חלון מונפש שהודבק לתוך צילום דומם
-      const sh = shake.current
-      const rig = rigRef.current
-      if (rig && !rm) {
-        if (sh.amp > 0.02) {
-          sh.t += dt
-          sh.amp *= Math.pow(0.9986, dt)
-          const a = sh.amp
-          const x = Math.sin(sh.t * 0.045) * a * 0.5
-          const y = Math.sin(sh.t * 0.067 + 1.1) * a
-          const r = Math.sin(sh.t * 0.037) * a * 0.045
-          rig.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${r.toFixed(3)}deg)`
-        } else if (sh.amp !== 0) {
-          sh.amp = 0
-          rig.style.transform = ''
+      const v = videoRef.current
+      if (v && !v.paused && !rm) {
+        const t = v.currentTime
+        while (cue < T_STOP.length && t >= T_STOP[cue]) {
+          tick(150 + cue * 26, 0.07, 0.09)
+          buzz(12)
+          cue++
         }
+        if (t >= T_REVEAL) reveal()
+        if (t >= T_HANDOFF) handoff()
       }
-      if (!rm && reels.current?.isSpinning() && !revealedRef.current) {
-        flicker.current = 0.3 + 0.24 * Math.sin(now * 0.019)
-        paintMachine(true)
-      }
-
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(rafRef.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setPull, rm])
+    return () => {
+      stopped = true
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [handoff, reveal, rm, setPull, tick])
 
-  /* ---------- טעינה ---------- */
+  /* ---------- טעינה מוקדמת של פריימי המשיכה ---------- */
   useEffect(() => {
     let alive = true
     let loaded = 0
-    const need = PULL_FRAMES + 1
     const imgs: HTMLImageElement[] = []
     framesRef.current = imgs
-
     const settle = () => {
       if (!alive) return
-      loaded++
-      if (loaded >= need) {
-        setReady(true)
-        paintMachine(true)
-      }
+      if (++loaded >= PULL_FRAMES) setReady(true)
     }
     for (let i = 0; i < PULL_FRAMES; i++) {
       const img = new Image()
       img.src = frameSrc(i)
       img.onload = () => {
-        if (i === 0) paintMachine(true)
+        if (i === 0) {
+          sizeCanvas()
+          paint()
+        }
         settle()
       }
       img.onerror = settle
       imgs.push(img)
     }
-    const lit = new Image()
-    lit.src = media('machine/lit.webp')
-    lit.onload = settle
-    lit.onerror = settle
-    litRef.current = lit
-
+    const onResize = () => {
+      sizeCanvas()
+      paint()
+    }
+    window.addEventListener('resize', onResize)
     const t = window.setTimeout(() => alive && setReady(true), 6000)
     return () => {
       alive = false
       window.clearTimeout(t)
-    }
-  }, [paintMachine])
-
-  /* ---------- הרכבת הגלגלים ---------- */
-  useEffect(() => {
-    const canvas = reelsRef.current
-    if (!canvas) return
-    const r = createReels(canvas, {
-      onStop: (i) => {
-        tick(150 + i * 26, 0.07, 0.09)
-        shake.current.amp += 1.9 // each drum seating kicks the cabinet
-      },
-      onFinish: reveal,
-    })
-    reels.current = r
-
-    const onResize = () => {
-      sizeMachine()
-      r.resize()
-      paintMachine(true)
-    }
-    // הפונט של הספרות חייב להיות טעון לפני הציור הראשון
-    ;(document as any).fonts?.ready?.then(() => r.draw())
-    onResize()
-    window.addEventListener('resize', onResize)
-
-    if (rm) {
-      r.showResult()
-      litMix.current = 1
-      paintMachine(true)
-      revealedRef.current = true
-      setPhase('revealed')
-      later(handoff, 2600)
-    }
-
-    return () => {
       window.removeEventListener('resize', onResize)
-      reels.current = null
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [paint, sizeCanvas])
 
   useEffect(
     () => () => {
@@ -333,6 +254,29 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     [],
   )
 
+  /* ---------- תנועה מצומצמת: התוצאה בלי הסיבוב ---------- */
+  const onLoadedData = () => {
+    const v = videoRef.current
+    if (!v) return
+    if (rm) {
+      v.currentTime = T_REVEAL + 0.35
+      setPhase('revealed')
+      revealedRef.current = true
+      later(handoff, 2600)
+      return
+    }
+    // מחממים את הקליפ כדי שהשחרור יתחיל מיד, בלי המתנה לרשת
+    void v
+      .play()
+      .then(() => {
+        v.pause()
+        v.currentTime = 0
+      })
+      .catch(() => {
+        /* הדפדפן יחכה לנגיעה — זה בסדר */
+      })
+  }
+
   /* ---------- משיכת הידית ---------- */
 
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -341,7 +285,8 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       return
     }
     if (phase === 'spinning') {
-      reels.current?.hurry()
+      const v = videoRef.current
+      if (v) v.playbackRate = 2.6 // לא מתעלמים ממגע באמצע — מזרזים
       return
     }
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -367,26 +312,21 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     drag.current = null
     setPulling(false)
 
+    // מהירות מתוך היסטוריית התנועה האחרונה, לא מהנקודה האחרונה בלבד
     const now = performance.now()
     const recent = d.hist.filter((p) => now - p.t < 90)
     const a = recent[0] ?? d.hist[0]
     const b = d.hist[d.hist.length - 1]
-    const velocity = ((b.y - a.y) / Math.max(b.t - a.t, 1)) * 1000
-    const v = velocity / TRAVEL
+    const v = (((b.y - a.y) / Math.max(b.t - a.t, 1)) * 1000) / TRAVEL
 
-    // הידית חוזרת למנוחה בזמן שהגלגלים כבר מסתובבים, כמו במכונה אמיתית
-    const release = (power: number) => {
-      startSpin(power)
-      animateTo(0, 700) // slow enough to still be moving once the drums are up to speed
-    }
     if (d.moved < TAP_SLOP) {
-      animateTo(1, 210, () => release(1))
+      animateTo(1, 210, startSpin) // נגיעה קצרה: המכונה מושכת בעצמה
       return
     }
+    // מתחייבים לפי הכיוון שאליו הלכה היד, לא רק לפי המיקום
     if (pull.current + v * 0.12 >= 0.5) {
       const remaining = Math.max(0, 1 - pull.current)
-      const dur = Math.max(70, Math.min(240, (remaining / Math.max(Math.abs(v), 2.2)) * 1000))
-      animateTo(1, dur, () => release(clamp(0.85 + Math.abs(v) * 0.16, 0.85, 1.6)))
+      animateTo(1, Math.max(70, Math.min(240, (remaining / Math.max(Math.abs(v), 2.2)) * 1000)), startSpin)
     } else {
       animateTo(0, 380) // לא הספיק — חוזרת בשקט
     }
@@ -437,16 +377,21 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
           aria-label="משכו בידית לגילוי תאריך החתונה"
           style={{ cursor: revealed ? 'default' : pulling ? 'grabbing' : 'grab' }}
         >
-          <span className="slot-ground" aria-hidden="true" />
-          <div className="slot-rig" ref={rigRef}>
-          <canvas
-            ref={reelsRef}
-            className="slot-reels"
+          <canvas ref={machineRef} className="slot-media" aria-hidden="true" />
+          <video
+            ref={videoRef}
+            className="slot-media slot-video"
+            style={{ opacity: phase === 'pull' ? 0 : 1 }}
+            preload="auto"
+            muted
+            playsInline
+            onLoadedData={onLoadedData}
             aria-hidden="true"
-            style={{ left: pct(WIN.x, IMG_W), top: pct(WIN.y, IMG_H), width: pct(WIN.w, IMG_W), height: pct(WIN.h, IMG_H) }}
-          />
-          <canvas ref={machineRef} className="slot-machine" aria-hidden="true" />
-          </div>
+          >
+            {/* VP9 קטן יותר ומתנגן בכל דפדפן מודרני; ה-mp4 הוא הרשת לספארי ותיק */}
+            <source src={media('machine/spin.webm')} type="video/webm" />
+            <source src={media('machine/spin.mp4')} type="video/mp4" />
+          </video>
         </button>
       </div>
     </motion.div>
@@ -462,8 +407,4 @@ function rubber(x: number) {
 
 function easeOutCubic(t: number) {
   return 1 - Math.pow(1 - t, 3)
-}
-
-function clamp(v: number, a: number, b: number) {
-  return v < a ? a : v > b ? b : v
 }

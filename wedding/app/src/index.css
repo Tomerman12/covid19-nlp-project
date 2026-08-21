@@ -416,10 +416,9 @@ body.locked {
   inset: 0;
   z-index: 130;
   overflow: hidden;
-  background:
-    radial-gradient(900px 700px at 50% -10%, #fffdf4, transparent 60%),
-    radial-gradient(800px 700px at 50% 115%, #f2e8d2, transparent 60%),
-    var(--bg);
+  /* שטוח בכוונה: הרקע של המכונה נצרב בדיוק בצבע הזה, אז כל גרדיאנט כאן
+     היה מסגיר את גבולות המדיה */
+  background: var(--bg);
 }
 .slot-col {
   max-width: 460px;
@@ -455,9 +454,9 @@ body.locked {
   color: var(--champ);
 }
 
-/* המכונה: תמונה חתוכה מהרקע שלה, יושבת ישירות על הנייר — בלי מסגרת,
-   בלי מלבן, בלי רקע משלה. הצל נבנה כאן ב-CSS ולא נלקח מהקליפ, כדי
-   שיהיה נקי ובצבע הנכון על הקרם. */
+/* המכונה. שני החלקים — פריימי המשיכה והקליפ — הורכבו מראש על הקרם של העמוד,
+   אז אין להם אלפא ואין להם מסגרת. ההינמכה בקצוות מכסה את ההפרש של 2-3 רמות
+   שהקודק מכניס לצבע הנייר, שאחרת היה נראה כמלבן חיוור. */
 .slot-stage {
   position: relative;
   flex: 0 0 auto;
@@ -471,37 +470,26 @@ body.locked {
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  --fade: 16px;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%),
+    linear-gradient(to right, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%),
+    linear-gradient(to right, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
+  mask-composite: intersect;
 }
-.slot-ground {
+.slot-media {
   position: absolute;
-  left: 8%;
-  right: 12%;
-  bottom: 1.5%;
-  height: 5%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(87, 80, 58, 0.34), rgba(87, 80, 58, 0));
-  filter: blur(3px);
-}
-/* גם המכונה וגם הגלגלים יושבים כאן, כדי שהרעידה תזיז אותם ביחד */
-.slot-rig {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
-}
-.slot-reels,
-.slot-machine {
-  position: absolute;
-  display: block;
-}
-.slot-reels {
-  /* המיקום מגיע מהקומפוננטה — זה בדיוק החור שנוקב בתמונת המכונה */
-  border-radius: 3px;
-}
-.slot-machine {
   inset: 0;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 10px 14px rgba(87, 80, 58, 0.18));
+  display: block;
+  object-fit: fill;
+}
+.slot-video {
+  transition: opacity 0.1s linear;
 }
 
 /* השורה שמתחת לתמונה: ההנחיה לפני, התאריך אחרי — באותו גובה, בלי קפיצה */

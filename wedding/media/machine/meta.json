@@ -1,19 +1,10 @@
 {
-  "crop": [
-    430,
-    29,
+  "size": [
     482,
     668
   ],
   "pullFrames": 31,
-  "window": [
-    96,
-    232,
-    229,
-    148
-  ],
-  "size": [
-    482,
-    668
-  ]
+  "videoStartsAtSourceT": 1.0833333333333333,
+  "videoFrames": 190,
+  "videoDuration": 7.917
 }
