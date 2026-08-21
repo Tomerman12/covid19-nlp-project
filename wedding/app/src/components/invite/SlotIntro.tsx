@@ -49,6 +49,11 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
   const rafRef = useRef<number>(0)
   const doneRef = useRef(false)
   const revealedRef = useRef(false)
+  const rigRef = useRef<HTMLDivElement | null>(null)
+  /** רעידת המכונה בזמן שהגלגלים מסתובבים */
+  const shake = useRef({ amp: 0, t: 0 })
+  /** הבהוב הנורות בזמן הסיבוב, לפני שהן נדלקות לגמרי */
+  const flicker = useRef(0)
 
   const later = (fn: () => void, ms: number) => {
     timersRef.current.push(window.setTimeout(fn, ms))
@@ -119,10 +124,23 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       ctx.clearRect(0, 0, c.width, c.height)
       ctx.drawImage(img, 0, 0, c.width, c.height)
       const lit = litRef.current
-      if (litMix.current > 0 && lit?.complete) {
-        ctx.globalAlpha = litMix.current
-        ctx.drawImage(lit, 0, 0, c.width, c.height)
-        ctx.globalAlpha = 1
+      if (lit?.complete) {
+        if (litMix.current > 0) {
+          ctx.globalAlpha = litMix.current
+          ctx.drawImage(lit, 0, 0, c.width, c.height)
+          ctx.globalAlpha = 1
+        } else if (flicker.current > 0) {
+          // רק קשת הנורות מהבהבת בזמן הסיבוב. הפריים המואר צולם בשנייה אחרת
+          // בקליפ, אז הוא בהיר ב-25% *בכל* הגוף — בלי החיתוך הזה כל המכונה
+          // הייתה פועמת בבהירות במקום הנורות.
+          ctx.save()
+          ctx.beginPath()
+          ctx.rect(c.width * 0.05, c.height * 0.09, c.width * 0.9, c.height * 0.22)
+          ctx.clip()
+          ctx.globalAlpha = flicker.current
+          ctx.drawImage(lit, 0, 0, c.width, c.height)
+          ctx.restore()
+        }
       }
       if (i !== shownFrame.current && Math.abs(i - lastTickFrame.current) >= 3) {
         lastTickFrame.current = i
@@ -158,6 +176,8 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     setPhase('revealed')
     tick(320, 0.06, 0.25)
     buzz([18, 60, 18])
+    flicker.current = 0
+    shake.current.amp += 2.8 // the final thunk as the last drum seats
     // הנורות נדלקות ברגע שהתאריך נעול
     const t0 = performance.now()
     const glow = () => {
@@ -174,6 +194,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     (power: number) => {
       setPhase('spinning')
       buzz(24)
+      shake.current = { amp: 2.6, t: 0 } // the whole cabinet starts to shudder
       reels.current?.start(power)
     },
     [],
@@ -195,11 +216,36 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
         }
       }
       reels.current?.step(dt)
+
+      // המכונה עצמה חיה כל עוד הגלגלים מסתובבים — אחרת זה נראה כמו
+      // חלון מונפש שהודבק לתוך צילום דומם
+      const sh = shake.current
+      const rig = rigRef.current
+      if (rig && !rm) {
+        if (sh.amp > 0.02) {
+          sh.t += dt
+          sh.amp *= Math.pow(0.9986, dt)
+          const a = sh.amp
+          const x = Math.sin(sh.t * 0.045) * a * 0.5
+          const y = Math.sin(sh.t * 0.067 + 1.1) * a
+          const r = Math.sin(sh.t * 0.037) * a * 0.045
+          rig.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${r.toFixed(3)}deg)`
+        } else if (sh.amp !== 0) {
+          sh.amp = 0
+          rig.style.transform = ''
+        }
+      }
+      if (!rm && reels.current?.isSpinning() && !revealedRef.current) {
+        flicker.current = 0.3 + 0.24 * Math.sin(now * 0.019)
+        paintMachine(true)
+      }
+
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(rafRef.current)
-  }, [setPull])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setPull, rm])
 
   /* ---------- טעינה ---------- */
   useEffect(() => {
@@ -245,7 +291,10 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     const canvas = reelsRef.current
     if (!canvas) return
     const r = createReels(canvas, {
-      onStop: (i) => tick(150 + i * 26, 0.07, 0.09),
+      onStop: (i) => {
+        tick(150 + i * 26, 0.07, 0.09)
+        shake.current.amp += 1.9 // each drum seating kicks the cabinet
+      },
       onFinish: reveal,
     })
     reels.current = r
@@ -328,7 +377,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     // הידית חוזרת למנוחה בזמן שהגלגלים כבר מסתובבים, כמו במכונה אמיתית
     const release = (power: number) => {
       startSpin(power)
-      animateTo(0, 420)
+      animateTo(0, 700) // slow enough to still be moving once the drums are up to speed
     }
     if (d.moved < TAP_SLOP) {
       animateTo(1, 210, () => release(1))
@@ -389,6 +438,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
           style={{ cursor: revealed ? 'default' : pulling ? 'grabbing' : 'grab' }}
         >
           <span className="slot-ground" aria-hidden="true" />
+          <div className="slot-rig" ref={rigRef}>
           <canvas
             ref={reelsRef}
             className="slot-reels"
@@ -396,6 +446,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
             style={{ left: pct(WIN.x, IMG_W), top: pct(WIN.y, IMG_H), width: pct(WIN.w, IMG_W), height: pct(WIN.h, IMG_H) }}
           />
           <canvas ref={machineRef} className="slot-machine" aria-hidden="true" />
+          </div>
         </button>
       </div>
     </motion.div>

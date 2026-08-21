@@ -482,6 +482,12 @@ body.locked {
   background: radial-gradient(closest-side, rgba(87, 80, 58, 0.34), rgba(87, 80, 58, 0));
   filter: blur(3px);
 }
+/* גם המכונה וגם הגלגלים יושבים כאן, כדי שהרעידה תזיז אותם ביחד */
+.slot-rig {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
 .slot-reels,
 .slot-machine {
   position: absolute;
