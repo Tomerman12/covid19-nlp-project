@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
 import { MACHINE_VERSION } from '@/lib/machineVersion'
+import { ConfettiEngine } from '@/lib/confetti'
 
 /* ---------------------------------------------------------------------------
  * מסך הפתיחה: מכונת המזל.
@@ -44,6 +45,9 @@ type Phase = 'pull' | 'spinning' | 'revealed'
 export default function SlotIntro({ onDone }: { onDone: () => void }) {
   const machineRef = useRef<HTMLCanvasElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const stageRef = useRef<HTMLButtonElement | null>(null)
+  const confettiRef = useRef<HTMLCanvasElement | null>(null)
+  const confetti = useRef<ConfettiEngine | null>(null)
   const framesRef = useRef<HTMLImageElement[]>([])
   const audioRef = useRef<AudioContext | null>(null)
   const timersRef = useRef<number[]>([])
@@ -148,7 +152,17 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     setPhase('revealed')
     tick(320, 0.06, 0.25)
     buzz([18, 60, 18])
-  }, [tick])
+
+    // קונפטי סביב המכונה ברגע שהתאריך ננעל. הקליפ עצמו לא יכול לספק אותו —
+    // הגזירה שומרת רק את הגוף המחובר, אז פתיתים שלא נוגעים במכונה נופלים בדרך.
+    const e = confetti.current
+    const r = stageRef.current?.getBoundingClientRect()
+    if (e && r && !rm) {
+      e.burst(r.left + r.width * 0.12, r.top + r.height * 0.22, 55)
+      e.burst(r.right - r.width * 0.12, r.top + r.height * 0.22, 55)
+      e.burst(r.left + r.width * 0.5, Math.max(r.top - 8, 8), 45)
+    }
+  }, [rm, tick])
 
   /** נפילה חזרה לתמונה דוממת: מציגים את התאריך ועוברים הלאה */
   const staticFinish = useCallback(
@@ -236,9 +250,13 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       img.onerror = settle
       imgs.push(img)
     }
+    if (confettiRef.current && !confetti.current) {
+      confetti.current = new ConfettiEngine(confettiRef.current)
+    }
     const onResize = () => {
       sizeCanvas()
       paint()
+      confetti.current?.resize()
     }
     window.addEventListener('resize', onResize)
     const t = window.setTimeout(() => alive && setReady(true), 6000)
@@ -372,6 +390,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
         </div>
 
         <button
+          ref={stageRef}
           className="slot-stage"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -397,6 +416,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
           </video>
         </button>
       </div>
+      <canvas ref={confettiRef} className="slot-confetti" aria-hidden="true" />
     </motion.div>
   )
 }
