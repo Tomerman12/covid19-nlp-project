@@ -54,6 +54,10 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
   const rafRef = useRef<number>(0)
   const doneRef = useRef(false)
   const revealedRef = useRef(false)
+  const unlockedRef = useRef(false)
+  const startedRef = useRef(false)
+  /** מתי הקליפ התקדם בפעם האחרונה — כך מזהים גם "לא התחיל" וגם "נתקע באמצע" */
+  const progressRef = useRef({ t: -1, at: 0 })
 
   const later = (fn: () => void, ms: number) => {
     timersRef.current.push(window.setTimeout(fn, ms))
@@ -182,14 +186,11 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       staticFinish()
       return
     }
+    startedRef.current = true
+    progressRef.current = { t: -1, at: performance.now() }
     v.currentTime = 0
     v.playbackRate = 1
     void v.play().catch(() => {})
-    // רשת ביטחון אחת לכל התקלות: קודק חסר, רשת שנפלה, נגינה שנחסמה
-    later(() => {
-      const el = videoRef.current
-      if (!el || el.paused || el.currentTime < 0.1) staticFinish(0)
-    }, 900)
   }, [staticFinish])
 
   /* ---------- לולאה אחת: אנימציית הידית + מעקב אחרי זמן הקליפ ---------- */
@@ -208,6 +209,21 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
         }
       }
       const v = videoRef.current
+
+      // רשת ביטחון אחת שמכסה הכול: קודק חסר, רשת שנפלה, נגינה שנחסמה, או
+      // קליפ שהתחיל ונתקע. במקום שעון קבוע — היעדר התקדמות. ברשת סלולרית
+      // איטית הקליפ פשוט יתחיל מאוחר יותר, וזה בסדר.
+      if (v && startedRef.current && !revealedRef.current && !rm) {
+        const pr = progressRef.current
+        if (v.currentTime > pr.t + 0.01) {
+          pr.t = v.currentTime
+          pr.at = now
+        } else if (now - pr.at > 4000) {
+          startedRef.current = false
+          staticFinish(0)
+        }
+      }
+
       if (v && !v.paused && !rm) {
         const t = v.currentTime
         while (cue < T_STOP.length && t >= T_STOP[cue]) {
@@ -225,7 +241,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       stopped = true
       cancelAnimationFrame(rafRef.current)
     }
-  }, [handoff, reveal, rm, setPull, tick])
+  }, [handoff, reveal, rm, setPull, staticFinish, tick])
 
   /* ---------- טעינה מוקדמת של פריימי המשיכה ---------- */
   useEffect(() => {
@@ -310,6 +326,24 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       if (v) v.playbackRate = 2.6 // לא מתעלמים ממגע באמצע — מזרזים
       return
     }
+    // iOS מכבד play() רק בתוך מחווה אמיתית, והשחרור שלנו קורה מאוחר יותר
+    // בתוך לולאת האנימציה — אז משחררים את הנעילה כאן, בתוך הנגיעה עצמה.
+    const v = videoRef.current
+    if (v && !unlockedRef.current) {
+      unlockedRef.current = true
+      void v
+        .play()
+        .then(() => {
+          // on a slow connection this promise can settle after the real spin has
+          // begun — pausing then would stop the clip dead
+          if (!startedRef.current) {
+            v.pause()
+            v.currentTime = 0
+          }
+        })
+        .catch(() => {})
+    }
+
     e.currentTarget.setPointerCapture(e.pointerId)
     anim.current = null
     drag.current = { id: e.pointerId, y0: e.clientY, moved: 0, hist: [{ t: performance.now(), y: e.clientY }] }
@@ -410,9 +444,11 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
             onLoadedData={onLoadedData}
             aria-hidden="true"
           >
-            {/* VP9 קטן יותר ומתנגן בכל דפדפן מודרני; ה-mp4 הוא הרשת לספארי ותיק */}
-            <source src={media('machine/spin.webm')} type="video/webm" />
-            <source src={media('machine/spin.mp4')} type="video/mp4" />
+            {/* h.264 ראשון: כל טלפון מנגן אותו. ספארי מחזיר "maybe" ל-video/webm
+                חשוף, בוחר בו ואז נכשל — לכן ה-webm יושב שני ועם codecs מפורש,
+                כך שדפדפן שלא יודע לפענח VP9 פשוט מדלג עליו. */}
+            <source src={media('machine/spin.mp4')} type='video/mp4; codecs="avc1.640028"' />
+            <source src={media('machine/spin.webm')} type='video/webm; codecs="vp9"' />
           </video>
         </button>
       </div>
