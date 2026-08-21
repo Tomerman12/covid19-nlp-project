@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import SlotIntro from './components/invite/SlotIntro'
 import Hero from './components/invite/Hero'
-import Message from './components/invite/Message'
 import Countdown from './components/invite/Countdown'
 import Timeline from './components/invite/Timeline'
 import Venue from './components/invite/Venue'
@@ -38,7 +37,6 @@ export default function App() {
         <main>
           <ScrollProgress />
           <Hero />
-          <Message />
           <Countdown />
           <Timeline />
           <Venue />

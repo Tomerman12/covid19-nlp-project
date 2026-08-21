@@ -77,7 +77,7 @@ export default function Countdown() {
   const s = Math.floor((left % 6e4) / 1e3)
 
   return (
-    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(26px, 3.4vh, 40px) 22px' })}>
+    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(18px, 2.4vh, 28px) 22px' })}>
       {/* flickering grid stays a soft green ELEMENT behind the rose type */}
       <FlickeringGrid
         className="absolute inset-0 pointer-events-none"

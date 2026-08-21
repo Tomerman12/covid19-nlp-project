@@ -482,6 +482,12 @@ body.locked {
     linear-gradient(to right, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
   mask-composite: intersect;
 }
+.slot-confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
 .slot-media {
   position: absolute;
   inset: 0;
