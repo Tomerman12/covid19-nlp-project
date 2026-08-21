@@ -460,9 +460,11 @@ body.locked {
 .slot-stage {
   position: relative;
   flex: 0 0 auto;
-  width: 100%;
-  max-width: 340px;
-  aspect-ratio: 482 / 668;
+  /* מכונה עומדת על הרצפה היא גבוהה וצרה, אז הגובה הוא מה שמגביל אותה
+     על מסך טלפון — לא הרוחב */
+  height: min(58vh, 540px);
+  max-width: 100%;
+  aspect-ratio: 526 / 1094;
   padding: 0;
   border: 0;
   background: none;

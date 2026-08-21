@@ -21,6 +21,7 @@ Usage:
 import json
 import os
 import pathlib
+import re
 import subprocess
 
 import imageio_ffmpeg
@@ -31,43 +32,102 @@ from scipy import ndimage
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 SRC = os.environ.get("MACHINE_CLIP", "machine-source.mp4")
 OUT = pathlib.Path(__file__).resolve().parent.parent / "media" / "machine"
-H, W = 720, 1280
-
-# The clip is locked off and the machine never leaves this box. The box is what
-# separates it from its own cast shadow — no per-pixel rule can, because the
-# shadow at the base scores the same against the backdrop as the gold panel.
-MBOX = (470, 44, 892, 658)
 
 # the paper the invitation is printed on
 CREAM = np.array([248, 242, 228], float)
 
-# the lever swings down over these source frames; the video takes over at PULL_TO
-PULL_FROM, PULL_TO = 14 / 24, 26 / 24
-END_T = 9.0
+# where the lever swings down in the source clip; the video takes over at PULL_TO
+PULL_FROM = float(os.environ.get("PULL_FROM", 22 / 24))
+PULL_TO = float(os.environ.get("PULL_TO", 36 / 24))
+END_T = float(os.environ.get("END_T", 9.9))
 
-yy, xx = np.mgrid[0:H, 0:W].astype(float)
-yy /= H
-xx /= W
-RING = np.zeros((H, W), bool)
-RING[:, :380] = True
-RING[:, 930:] = True
-RING[:70, :] = True
-basis = lambda X, Y: np.stack(
-    [np.ones_like(X), X, Y, X * X, X * Y, Y * Y, X * X * Y, X * Y * Y], 1
-)
-# the ring and the basis never change, so solve the backdrop fit once
-PINV = np.linalg.pinv(basis(xx[RING], yy[RING]))
-BALL = basis(xx.ravel(), yy.ravel())
+W = H = 0
+RING = KEEP = PINV = BALL = None
+FLOOR_Y = 0
 
-KEEP = np.zeros((H, W), bool)
-KEEP[MBOX[1]:MBOX[3], MBOX[0]:MBOX[2]] = True
+
+def probe():
+    """Read the clip's dimensions off ffmpeg."""
+    out = subprocess.run([FF, "-i", SRC], capture_output=True, text=True).stderr
+    m = re.search(r"Video:.*?, (\d+)x(\d+)", out)
+    if not m:
+        raise SystemExit("could not read the clip's dimensions")
+    return int(m.group(1)), int(m.group(2))
+
+
+def build_model():
+    """The backdrop fit only needs solving once — the ring never moves."""
+    global RING, PINV, BALL
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    yy /= H
+    xx /= W
+    RING = np.zeros((H, W), bool)
+    RING[:, : int(W * 0.16)] = True
+    RING[:, int(W * 0.88):] = True
+    RING[: int(H * 0.06), :] = True
+    basis = lambda X, Y: np.stack(
+        [np.ones_like(X), X, Y, X * X, X * Y, Y * Y, X * X * Y, X * Y * Y,
+         X * X * X, Y * Y * Y], 1
+    )
+    PINV = np.linalg.pinv(basis(xx[RING], yy[RING]))
+    BALL = basis(xx.ravel(), yy.ravel())
+
+
+def backdrop(f):
+    pred = np.empty_like(f)
+    for c in range(3):
+        pred[..., c] = (BALL @ (PINV @ f[..., c][RING])).reshape(H, W)
+    return pred
+
+
+def find_machine(f):
+    """Locate the machine so its own cast shadow can be excluded.
+
+    No per-pixel rule separates the two — the shadow at the base scores the same
+    against the backdrop as the machine's darker panels do. But the machine is a
+    tall object and the shadow is a low, wide smear, so the columns it occupies
+    give it away.
+    """
+    global KEEP, FLOOR_Y
+    # A high threshold for the bootstrap: the machine differs strongly from the
+    # backdrop, while whatever the light throws on the back wall is only a mild
+    # darkening and would otherwise be picked up as part of the subject.
+    rough = ndimage.binary_opening(np.abs(f - backdrop(f)).max(2) > 55, np.ones((4, 4)))
+
+    tall = rough.sum(0) > H * 0.30
+    if not tall.any():
+        raise SystemExit("could not find the machine in the first frame")
+    lab, n = ndimage.label(tall)
+    which = int(lab[W // 2])
+    if which == 0:  # the machine is off-centre — take the widest run instead
+        which = int(np.argmax(ndimage.sum(tall, lab, range(1, n + 1)))) + 1
+    core = np.where(lab == which)[0]
+
+    # the body is the one big blob inside those columns; taking the component
+    # rather than a per-row count keeps the narrow top of the arch
+    sub = rough.copy()
+    sub[:, :core.min()] = False
+    sub[:, core.max() + 1:] = False
+    l2, n2 = ndimage.label(sub)
+    big = int(np.argmax(ndimage.sum(sub, l2, range(1, n2 + 1)))) + 1
+    ys = np.where(ndimage.binary_fill_holes(l2 == big).any(1))[0]
+    y0, y1 = int(ys.min()), int(ys.max())
+
+    # the lever reaches outside the body's columns, so measure the width across
+    # the machine's own height, stopping short of the floor and its shadow
+    band = rough[y0:y0 + int((y1 - y0) * 0.85)]
+    wide = np.where(band.sum(0) > (y1 - y0) * 0.02)[0]
+    x0, x1 = int(wide.min()), int(wide.max())
+
+    KEEP = np.zeros((H, W), bool)
+    KEEP[max(0, y0 - 6):y1 + 10, max(0, x0 - 6):x1 + 10] = True
+    FLOOR_Y = y0 + int((y1 - y0) * 0.78)   # the contact shadow lives below this
+    print(f"machine at x {x0}..{x1}  y {y0}..{y1}   floor band from y={FLOOR_Y}")
 
 
 def matte(f):
     """Return (alpha, shadow) for one frame of the clip."""
-    pred = np.empty_like(f)
-    for c in range(3):
-        pred[..., c] = (BALL @ (PINV @ f[..., c][RING])).reshape(H, W)
+    pred = backdrop(f)
 
     solid = (np.abs(f - pred).max(2) > 26) & KEEP
     solid = ndimage.binary_closing(solid, np.ones((5, 5)))
@@ -83,9 +143,16 @@ def matte(f):
     alpha = ndimage.gaussian_filter(solid.astype(float), 1.5)
     alpha = np.clip((alpha - 0.20) / 0.55, 0, 1)
 
-    # the shadow darkens the paper rather than lifting the clip's tan backdrop
+    # The shadow darkens the paper rather than lifting the clip's tan backdrop.
+    # Only the contact shadow on the floor is wanted — anything the light throws
+    # on the back wall is part of the studio, not of the machine, and would show
+    # up as streaks across the invitation.
     ratio = np.clip(f.sum(2) / np.maximum(pred.sum(2), 1), 0, 1)
-    shadow = ndimage.gaussian_filter(np.clip((1 - ratio) * 1.5, 0, 1) * (1 - alpha), 3)
+    shadow = np.clip((1 - ratio) * 1.5, 0, 1) * (1 - alpha)
+    floor = np.zeros_like(shadow)
+    floor[FLOOR_Y:] = 1
+    floor = ndimage.gaussian_filter(floor, 18)
+    shadow = ndimage.gaussian_filter(shadow * floor, 3)
     return alpha[..., None], shadow
 
 
@@ -105,20 +172,27 @@ def decode(ss, to, extra=None):
 
 
 def main():
+    global W, H
     OUT.mkdir(parents=True, exist_ok=True)
+    W, H = probe()
+    print(f"clip {W}x{H}")
+    build_model()
 
     # ---- the pull: 12 source frames interpolated up so a slow drag doesn't step
     pull = decode(PULL_FROM, PULL_TO,
                   "minterpolate=fps=72:mi_mode=mci:mc_mode=aobmc:vsbmc=1")
     print(f"pull frames: {len(pull)}")
 
+    find_machine(pull[0])
     a, _ = matte(pull[0])
     m = a[..., 0] > 0.5
     cols, rows = np.where(m.any(0))[0], np.where(m.any(1))[0]
-    cx, cy = int(cols.min()) - 40, int(rows.min()) - 30
-    cw, ch = int(cols.max()) + 40 - cx, int(rows.max()) + 40 - cy
+    cx, cy = max(0, int(cols.min()) - 40), max(0, int(rows.min()) - 30)
+    cw = min(int(cols.max()) + 40, W) - cx
+    ch = min(int(rows.max()) + 40, H) - cy
     cw -= cw % 2   # h.264 wants even dimensions
     ch -= ch % 2
+    assert cx + cw <= W and cy + ch <= H, "crop runs past the frame"
     print(f"machine at x {cols.min()}..{cols.max()} y {rows.min()}..{rows.max()}"
           f"   crop {cw}x{ch} at ({cx},{cy})")
 

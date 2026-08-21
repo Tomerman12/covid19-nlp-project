@@ -1,10 +1,10 @@
 {
   "size": [
-    482,
-    668
+    526,
+    1094
   ],
-  "pullFrames": 31,
-  "videoStartsAtSourceT": 1.0833333333333333,
-  "videoFrames": 190,
-  "videoDuration": 7.917
+  "pullFrames": 37,
+  "videoStartsAtSourceT": 1.5,
+  "videoFrames": 202,
+  "videoDuration": 8.417
 }

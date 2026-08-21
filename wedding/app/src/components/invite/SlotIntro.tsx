@@ -14,7 +14,7 @@ import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
  * של המכונה עצמה. מה שיוצא הוא מדיה אטומה רגילה שהרקע שלה *הוא* העמוד: בלי
  * ערוץ אלפא, בלי קודק מיוחד, ובלי מסגרת שנראית.
  *
- *   media/machine/pull/01..31.webp   הידית יורדת, פריים לכל שלב
+ *   media/machine/pull/01..37.webp   הידית יורדת, פריים לכל שלב
  *   media/machine/spin.webm|.mp4     מרגע השחרור: הסיבוב, הנעילה, הקונפטי
  *
  * שני החלקים חתוכים באותו crop וממשיכים זה את זה על אותו פריים בדיוק.
@@ -23,13 +23,13 @@ import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
 const inlined: Record<string, string> | undefined = (window as any).__WEDDING_MEDIA__
 const media = (name: string) => inlined?.[name] ?? `media/${name}`
 
-const PULL_FRAMES = 31
+const PULL_FRAMES = 37
 const frameSrc = (i: number) => media(`machine/pull/${String(i + 1).padStart(2, '0')}.webp`)
 
 /* ציוני הדרך בתוך spin.webm (שניות) — נמדדו מהקליפ החתוך עצמו */
-const T_STOP = [2.78, 3.42, 4.42] // שלושת התופים נתפסים
-const T_REVEAL = 4.85 // הגלגלים נעולים על 28 · 10 · 26
-const T_HANDOFF = 6.5 // עוברים להזמנה בזמן שהקונפטי יורד
+const T_STOP = [2.5, 3.42, 4.55] // שלושת התופים נתפסים
+const T_REVEAL = 4.75 // הגלגלים נעולים על 28 · 10 · 26
+const T_HANDOFF = 7.0 // אחרי שהנורות נדלקות (5.65), לפני סוף הקליפ (8.42)
 
 /** כמה פיקסלים של גרירה שווים משיכה מלאה */
 const TRAVEL = 118
