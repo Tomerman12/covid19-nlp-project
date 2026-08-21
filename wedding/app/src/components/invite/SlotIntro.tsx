@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
+import { MACHINE_VERSION } from '@/lib/machineVersion'
 
 /* ---------------------------------------------------------------------------
  * מסך הפתיחה: מכונת המזל.
@@ -21,7 +22,9 @@ import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
  * ------------------------------------------------------------------------- */
 
 const inlined: Record<string, string> | undefined = (window as any).__WEDDING_MEDIA__
-const media = (name: string) => inlined?.[name] ?? `media/${name}`
+/* the version stamp makes a rebuild a different URL, so a stale cache can never
+   serve last week's machine inside this week's page */
+const media = (name: string) => inlined?.[name] ?? `media/${name}?v=${MACHINE_VERSION}`
 
 const PULL_FRAMES = 37
 const frameSrc = (i: number) => media(`machine/pull/${String(i + 1).padStart(2, '0')}.webp`)
