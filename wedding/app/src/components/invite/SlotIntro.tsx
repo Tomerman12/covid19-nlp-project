@@ -187,10 +187,35 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       return
     }
     startedRef.current = true
+
+    const go = () => {
+      progressRef.current = { t: -1, at: performance.now() }
+      v.currentTime = 0
+      v.playbackRate = 1
+      void v.play().catch(() => {})
+    }
+
+    // לא מתחילים לנגן לתוך באפר ריק. או שהקליפ מוכן והסיבוב רץ חלק, או
+    // שעוברים ישר לתאריך — קפיאה של ארבע שניות באמצע הסיבוב היא הדבר
+    // הגרוע מבין השלושה, וזה מה שנראה במכשיר.
+    if (v.readyState >= 3) {
+      go()
+      return
+    }
     progressRef.current = { t: -1, at: performance.now() }
-    v.currentTime = 0
-    v.playbackRate = 1
-    void v.play().catch(() => {})
+    const onReady = () => {
+      v.removeEventListener('canplay', onReady)
+      window.clearTimeout(wait)
+      go()
+    }
+    v.addEventListener('canplay', onReady)
+    const wait = window.setTimeout(() => {
+      v.removeEventListener('canplay', onReady)
+      startedRef.current = false
+      staticFinish(0)
+    }, 1500)
+    timersRef.current.push(wait)
+    v.load()
   }, [staticFinish])
 
   /* ---------- לולאה אחת: אנימציית הידית + מעקב אחרי זמן הקליפ ---------- */
@@ -242,6 +267,46 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       cancelAnimationFrame(rafRef.current)
     }
   }, [handoff, reveal, rm, setPull, staticFinish, tick])
+
+  /* ---------- הורדת הקליפ לזיכרון מראש ----------
+   * iOS מתעלם מ-`preload` על סלולרי: הוא מתחיל להוריד רק כשקוראים ל-play,
+   * ואז נגמר לו הבאפר באמצע הסיבוב והתמונה קופאת. מושכים אותו כאן כ-blob,
+   * כך שכשמשחררים את הידית הקובץ כבר בזיכרון ואי אפשר לעקוף אותו.
+   */
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v || typeof fetch !== 'function' || !('createObjectURL' in URL)) return
+    const url = media(
+      v.canPlayType('video/mp4; codecs="avc1.640028"') ? 'machine/spin.mp4' : 'machine/spin.webm',
+    )
+    let alive = true
+    let objectUrl = ''
+    fetch(url)
+      .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+      .then((blob) => {
+        // אם הסיבוב כבר רץ, החלפת src הייתה מאפסת אותו באמצע
+        if (!alive || startedRef.current) return
+        objectUrl = URL.createObjectURL(blob)
+        v.src = objectUrl
+        v.load()
+      })
+      .catch(() => {
+        /* נשארים עם ה-<source> שבתגית — פשוט בלי היתרון של טעינה מראש */
+      })
+    return () => {
+      alive = false
+      if (!objectUrl) return
+      // משחררים את האלמנט לפני שמבטלים את ה-blob, אחרת הוא מבקש אותו שוב
+      // בזמן הפירוק ונרשמת בקשה שנכשלה
+      const el = videoRef.current
+      if (el) {
+        el.pause()
+        el.removeAttribute('src')
+        el.load()
+      }
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [])
 
   /* ---------- טעינה מוקדמת של פריימי המשיכה ---------- */
   useEffect(() => {
@@ -438,7 +503,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
             ref={videoRef}
             className="slot-media slot-video"
             style={{ opacity: phase === 'pull' ? 0 : 1 }}
-            preload="auto"
+            preload="none"
             muted
             playsInline
             onLoadedData={onLoadedData}
