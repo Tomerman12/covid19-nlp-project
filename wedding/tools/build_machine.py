@@ -197,6 +197,9 @@ def main():
     print(f"machine at x {cols.min()}..{cols.max()} y {rows.min()}..{rows.max()}"
           f"   crop {cw}x{ch} at ({cx},{cy})")
 
+    # Quality is set for a phone on cellular, not for a desktop review: the whole
+    # thing has to arrive before the machine can be pulled. CRF 26 measures
+    # 39.4 dB against CRF 20 here and is indistinguishable at this size.
     (OUT / "pull").mkdir(exist_ok=True)
     for old in (OUT / "pull").glob("*"):
         old.unlink()
@@ -205,7 +208,7 @@ def main():
         out = composite(f)[cy:cy + ch, cx:cx + cw]
         p = OUT / "pull" / f"{i + 1:02d}.webp"
         Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(
-            p, "WEBP", quality=90, method=5)
+            p, "WEBP", quality=82, method=5)
         total += p.stat().st_size
     print(f"  {len(pull)} stills, {total / 1024:.0f} KB")
 
@@ -216,10 +219,10 @@ def main():
         stdout=subprocess.PIPE)
     enc = {}
     for name, args in {
-        "spin.webm": ["-c:v", "libvpx-vp9", "-crf", "30", "-b:v", "0",
+        "spin.webm": ["-c:v", "libvpx-vp9", "-crf", "36", "-b:v", "0",
                       "-row-mt", "1", "-cpu-used", "2", "-g", "24"],
         "spin.mp4": ["-c:v", "libx264", "-profile:v", "high", "-preset", "slow",
-                     "-crf", "20", "-g", "24", "-movflags", "+faststart"],
+                     "-crf", "26", "-g", "24", "-movflags", "+faststart"],
     }.items():
         enc[name] = subprocess.Popen(
             [FF, "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{cw}x{ch}",
