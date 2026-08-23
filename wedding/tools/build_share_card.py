@@ -88,8 +88,9 @@ CARD = """<!doctype html>
     color: var(--ivory); margin-top: 16px;
   }
   .marry {
-    font-family: var(--display); font-weight: 700; font-size: 34px;
-    color: var(--champ); margin-top: 12px;
+    font-family: var(--serif); direction: ltr; font-weight: 600;
+    font-size: 27px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--champ); margin-top: 16px;
   }
   .rule {
     display: flex; align-items: center; justify-content: center;
@@ -123,7 +124,7 @@ CARD = """<!doctype html>
     <div class="copy">
       <div class="eyebrow">SAVE THE DATE</div>
       <div class="names">SHACHAF<br>&amp; TOMER</div>
-      <div class="marry">מתחתנים!</div>
+      <div class="marry">are getting married</div>
       <div class="rule"><i></i><b></b><i></i></div>
       <div class="date">28.10.2026</div>
       <div class="where">אולם אביגדור · בן אביגדור 22, תל אביב</div>
