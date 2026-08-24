@@ -11,6 +11,8 @@ import { MiniDiscoBall, SideVine } from './Flourish'
 import { PressedBotanicals } from './Botanicals'
 import { COUPLE, COUPLE_EN, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
 
+const MARQ = 'SHACHAF & TOMER — 28 . 10 . 2026 — TEL AVIV — '
+
 export default function Hero() {
   const rm = useReducedMotion()
 
@@ -34,9 +36,25 @@ export default function Hero() {
   const fade = useTransform(scrollY, [0, 500], [1, 0])
 
   return (
+    <>
+      {/* סרט הפתיחה. הוא ישב בתחתית ההירו והתנגש בקישוטי הפינות, אז הוא עלה
+          לראש העמוד — שם הוא קורא כמו סרט של הזמנה ולא כמו כתובית */}
+      <div className="marquee py-3" style={{ borderBottom: '1px solid var(--line)', background: 'var(--bg)' }}>
+        <div className="marquee__track">
+          {[0, 1].map((k) => (
+            <span
+              key={k}
+              className="font-serif2"
+              style={{ fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.34em', color: 'var(--champ)', opacity: 0.55 }}
+            >
+              {MARQ.repeat(4)}
+            </span>
+          ))}
+        </div>
+      </div>
     <header
       className="relative flex flex-col items-center justify-center text-center overflow-hidden"
-      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(80dvh, 440px)', padding: '18px 20px 58px' })}
+      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(78dvh, 412px)', padding: '14px 20px 56px' })}
     >
       <PressedBotanicals set="hero" />
       {!rm && <Particles className="absolute inset-0" quantity={80} color="#c4768f" ease={70} staticity={40} size={0.5} />}
@@ -191,5 +209,6 @@ export default function Hero() {
         </div>
       </motion.div>
     </header>
+    </>
   )
 }
