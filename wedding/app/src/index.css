@@ -426,6 +426,38 @@ body.locked {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+/* מצב מסיבה: הכפתור הזה הוא הזמנה ללחוץ, לא הערת שוליים. מלא, לא זכוכית,
+   עם טבעת שנפתחת החוצה כל כמה שניות כדי שהעין תמצא אותו. */
+.party-cta {
+  color: #fff;
+  border: 0;
+  background: linear-gradient(135deg, #a72d67, #7d5fc4);
+  box-shadow: 0 10px 28px rgba(167, 45, 103, 0.38);
+}
+.party-cta::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid var(--p1);
+  opacity: 0;
+  pointer-events: none;
+  animation: party-ring 3s ease-out infinite;
+}
+.party-cta[aria-pressed='true'] {
+  background: linear-gradient(135deg, #c02f78, #6f4fbe);
+  box-shadow: 0 0 32px rgba(255, 157, 190, 0.75), 0 10px 28px rgba(167, 45, 103, 0.4);
+}
+/* כשהמסיבה כבר רצה אין למה להזמין */
+.party-cta[aria-pressed='true']::after { animation: none; }
+@keyframes party-ring {
+  0% { transform: scale(0.97); opacity: 0.7; }
+  70%, 100% { transform: scale(1.16); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .party-cta::after { animation: none; }
+}
+
 .slot-screen:focus-visible {
   outline: 2px solid var(--champ);
   outline-offset: -4px;

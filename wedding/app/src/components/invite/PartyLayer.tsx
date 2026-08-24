@@ -185,26 +185,22 @@ export default function PartyLayer({
         onClick={handleToggle}
         aria-pressed={party}
         data-cursor
-        className="fixed flex items-center chrome-glass press"
+        className="fixed flex items-center press party-cta"
         style={{
           bottom: 18,
           insetInlineEnd: 18,
           zIndex: 70,
           gap: 10,
-          padding: '12px 20px',
+          padding: '14px 24px',
           borderRadius: 999,
-          background: 'rgba(255,255,255,.85)',
-          backdropFilter: 'blur(8px)',
-          border: party ? '1px solid var(--p1)' : '1px solid var(--line)',
-          color: 'var(--ivory)',
           fontFamily: 'var(--font-body)',
-          fontWeight: 700,
-          fontSize: '0.96rem',
+          fontWeight: 800,
+          fontSize: '1.04rem',
+          letterSpacing: '0.01em',
           cursor: 'pointer',
-          boxShadow: party ? '0 0 26px rgba(255,157,190,.6)' : '0 10px 26px rgba(163,80,109,.16)',
           opacity: showButton ? 1 : 0,
           pointerEvents: showButton ? 'auto' : 'none',
-          transition: 'opacity .5s ease, border-color .4s ease, box-shadow .4s ease',
+          transition: 'opacity .5s ease, background .4s ease, box-shadow .4s ease',
         }}
       >
         {IconDisco}
