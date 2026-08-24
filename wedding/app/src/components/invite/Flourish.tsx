@@ -150,7 +150,7 @@ export function GarlandDivider({ width = 260 }: { width?: number }) {
  */
 export function ScheduleVine({ colors }: { colors: readonly string[] }) {
   const CY = 26
-  const at = [750, 450, 150] // bloom centres, right to left
+  const at = [760, 450, 140] // bloom centres, right to left, pulled in by the grid gap
   const leaves: [number, number, number][] = [
     // x, y, rotation — one at the middle of each crest and trough of the wave
     [79, 19, -16], [223, 33, 14], [377, 19, -12], [523, 33, 16], [677, 19, -14], [821, 33, 12],
@@ -192,6 +192,26 @@ export function ScheduleVine({ colors }: { colors: readonly string[] }) {
       {/* the stem carries on past the outer blooms rather than stopping dead */}
       <circle cx="8" cy={CY} r="4" fill={CORAL} opacity="0.8" />
       <circle cx="892" cy={CY} r="4" fill={CORAL} opacity="0.8" />
+    </svg>
+  )
+}
+
+/**
+ * The stem that grows from one stage to the next when the schedule is stacked.
+ * Fixed height so the leaves never stretch: the rail column is a constant
+ * width, and this simply fills the gap between two rows.
+ */
+export function StemLink({ height = 34 }: { height?: number }) {
+  return (
+    <svg
+      viewBox="0 0 24 34"
+      fill="none"
+      aria-hidden="true"
+      style={{ display: 'block', width: 24, height, margin: '0 auto' }}
+    >
+      <path d="M12 0 C 15 9, 9 20, 12 34" stroke={STEM} strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+      <ellipse cx="5.5" cy="11" rx="6" ry="2.6" transform="rotate(-24 5.5 11)" fill={STEM} opacity="0.5" />
+      <ellipse cx="18.5" cy="23" rx="6" ry="2.6" transform="rotate(24 18.5 23)" fill={STEM} opacity="0.5" />
     </svg>
   )
 }

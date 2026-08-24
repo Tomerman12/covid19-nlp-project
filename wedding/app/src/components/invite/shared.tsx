@@ -28,6 +28,16 @@ export function FadeUp({
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin })
+  const rm = useReducedMotion()
+  // the reveal starts at opacity 0, so someone who asked for reduced motion has
+  // to get the content outright rather than a shorter version of the animation
+  if (rm) {
+    return (
+      <div className={className} style={style}>
+        {children}
+      </div>
+    )
+  }
   return (
     <motion.div
       ref={ref}
