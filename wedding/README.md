@@ -176,6 +176,30 @@ CRF 26 נמדד מול CRF 20 ב-**39.4dB PSNR** (הפרש ממוצע של 1.5 �
 כמו קובץ ישן. עכשיו זה לא יכול לקרות, ולכן `vercel.json` יכול לתת ל-`media/`
 קאש של שנה עם `immutable`.
 
+### כותרות האבטחה
+
+`vercel.json` שולח מדיניות `Content-Security-Policy` נעולה, יחד עם
+`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`,
+`Permissions-Policy` ו-`Strict-Transport-Security`.
+
+אפשר לנעול כל כך חזק כי הדף לא פונה החוצה בכלל: הבאנדל, העיצוב והפונטים מוטמעים
+בתוך ה-HTML, הפריימים והקליפ יושבים באותו מקור, והקליפ נמשך ל-blob. הקלטה של כל
+הבקשות לאורך המסלול המלא מראה אפס בקשות חיצוניות ואפס מסגרות, ולכן הכל מוצמד
+ל-`'self'` עם `data:` לתמונות ולפונטים ו-`blob:` לקליפ.
+
+`script-src` ו-`style-src` משאירים `'unsafe-inline'`, כי
+`vite-plugin-singlefile` מטמיע את שניהם בתוך הדף. אפשר היה להשתמש ב-hash, אבל
+הוא היה חייב להתחדש בכל בנייה — hash ישן שובר את העמוד כולו. שום דבר בדף לא קורא
+קלט משתמש, אז ההקלה הזו זולה לעומת חסימת כל מקור חיצוני.
+
+**JSON לא מכיל הערות.** ניסיון להסביר את המדיניות בתוך `vercel.json` דרך מפתח
+`"//"` הפיל דיפלוי — הסכמה של Vercel דוחה כל מפתח שהיא לא מכירה. לכן ההסבר יושב
+כאן, ו-`tools/check_vercel_config.py` מוודא שהקובץ תקין לפני שהוא מגיע לדיפלוי:
+
+```bash
+python3 tools/check_vercel_config.py
+```
+
 ### GitHub Pages, אם בא לכם בלי Vercel
 
 Settings → Pages → Source: `Deploy from a branch`, והכתובת תהיה
