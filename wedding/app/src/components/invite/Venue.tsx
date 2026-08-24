@@ -1,10 +1,10 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { Eyebrow, FadeUp, MagneticLink, IconNav, IconCal, IconDown } from './shared'
+import { Eyebrow, FadeUp, MagneticLink, IconNav, IconCal } from './shared'
 import { BorderBeam } from '@/components/vendor/border-beam'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, CornerSpray } from './Flourish'
 import { PressedBotanicals, SprigRow } from './Botanicals'
-import { VENUE, ADDR, DATE_LABEL, DAY_LABEL, TIME_LABEL, wazeUrl, gmapsUrl, gcalUrl, icsUrl } from '@/lib/wedding'
+import { VENUE, ADDR, wazeUrl, gmapsUrl, gcalUrl, icsUrl } from '@/lib/wedding'
 
 function Pin() {
   const rm = useReducedMotion()
@@ -40,7 +40,7 @@ export default function Venue() {
         <SprigRow color="#8fa3e8" />
       </FadeUp>
       <FadeUp delay={0.08}>
-        <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '14px 0 26px', color: 'var(--champ2)' }}>
+        <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '10px 0 18px', color: 'var(--champ2)' }}>
           איך מגיעים אלינו?
         </h2>
       </FadeUp>
@@ -73,29 +73,26 @@ export default function Venue() {
             {VENUE}
           </h3>
           <p style={{ fontSize: '1.14rem', margin: '6px 0 0' }}>{ADDR}</p>
-          <p style={{ color: 'var(--muted)', margin: '4px 0 0', fontSize: '0.96rem' }}>
-            {DAY_LABEL}, <span dir="ltr" className="tabular">{DATE_LABEL}</span>, קבלת פנים ב־<span dir="ltr" className="tabular">{TIME_LABEL}</span>
-          </p>
 
-          <div className="flex flex-col sm:flex-row sm:justify-center" style={{ gap: 12, marginTop: 30 }}>
+          {/* two buttons carry the work; the alternates sit under them as plain
+              links, so the card stays one screen shorter */}
+          <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 20 }}>
             <MagneticLink href={wazeUrl} primary>
               {IconNav}
               <span>ניווט ב־Waze</span>
             </MagneticLink>
             <MagneticLink href={gcalUrl}>
               {IconCal}
-              <span>יומן Google</span>
-            </MagneticLink>
-            <MagneticLink href={icsUrl} download="shachaf-tomer-wedding.ics">
-              {IconDown}
-              <span>יומן Apple / Outlook</span>
+              <span>יומן</span>
             </MagneticLink>
           </div>
 
-          <p style={{ marginTop: 18, fontSize: '0.88rem', color: 'var(--muted)' }}>
-            מעדיפים מפה?{' '}
-            <a href={gmapsUrl} target="_blank" rel="noopener" className="underline underline-offset-4" style={{ color: 'var(--muted)' }} data-cursor>
-              פתחו ב־Google Maps
+          <p className="flex justify-center flex-wrap" style={{ gap: '4px 18px', marginTop: 14, fontSize: '0.85rem', color: 'var(--muted)' }}>
+            <a href={gmapsUrl} target="_blank" rel="noopener" className="underline underline-offset-4" style={{ color: 'inherit' }} data-cursor>
+              Google Maps
+            </a>
+            <a href={icsUrl} download="shachaf-tomer-wedding.ics" className="underline underline-offset-4" style={{ color: 'inherit' }} data-cursor>
+              יומן Apple / Outlook
             </a>
           </p>
         </div>

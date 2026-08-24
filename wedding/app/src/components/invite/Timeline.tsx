@@ -1,7 +1,7 @@
 import { Eyebrow, FadeUp } from './shared'
 import { SCHEDULE } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
-import { Flourish, GarlandDivider } from './Flourish'
+import { Flourish } from './Flourish'
 import { PressedBotanicals, SprigRow, TimeSprig } from './Botanicals'
 
 /* the dots stay multicolored ELEMENTS; the rail they sit on is one colour */
@@ -21,7 +21,7 @@ export default function Timeline() {
           <Eyebrow>The Evening</Eyebrow>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '14px 0 30px', color: 'var(--champ2)' }}>
+          <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '10px 0 20px', color: 'var(--champ2)' }}>
             הערב שלנו, שלב אחרי שלב
           </h2>
         </FadeUp>
@@ -78,6 +78,23 @@ export default function Timeline() {
                 <h3 className="font-display" style={{ fontWeight: 900, fontSize: 'clamp(1.1rem, 3.8vw, 1.6rem)', margin: '6px 0 0', color: 'var(--champ2)' }}>
                   {ev.title}
                 </h3>
+                {'tag' in ev && ev.tag && (
+                  <span
+                    className="inline-block"
+                    style={{
+                      margin: '5px 0 0',
+                      padding: '2px 10px',
+                      borderRadius: 999,
+                      border: `1px solid ${DOT_COLORS[i]}`,
+                      color: DOT_COLORS[i],
+                      fontSize: 'clamp(0.68rem, 2.3vw, 0.8rem)',
+                      fontWeight: 700,
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    {ev.tag}
+                  </span>
+                )}
                 <p style={{ color: 'var(--muted)', margin: '4px 0 0', fontSize: 'clamp(0.78rem, 2.6vw, 0.95rem)', lineHeight: 1.55 }}>
                   {ev.desc}
                 </p>
@@ -89,9 +106,6 @@ export default function Timeline() {
           ))}
         </ol>
       </div>
-      <FadeUp delay={0.4}>
-        <GarlandDivider width={300} />
-      </FadeUp>
       </div>
     </section>
   )

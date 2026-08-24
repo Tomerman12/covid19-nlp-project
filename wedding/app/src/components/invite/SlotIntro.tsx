@@ -45,7 +45,7 @@ type Phase = 'pull' | 'spinning' | 'revealed'
 export default function SlotIntro({ onDone }: { onDone: () => void }) {
   const machineRef = useRef<HTMLCanvasElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const stageRef = useRef<HTMLButtonElement | null>(null)
+  const stageRef = useRef<HTMLDivElement | null>(null)
   const confettiRef = useRef<HTMLCanvasElement | null>(null)
   const confetti = useRef<ConfettiEngine | null>(null)
   const framesRef = useRef<HTMLImageElement[]>([])
@@ -299,12 +299,16 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       // משחררים את האלמנט לפני שמבטלים את ה-blob, אחרת הוא מבקש אותו שוב
       // בזמן הפירוק ונרשמת בקשה שנכשלה
       const el = videoRef.current
+      const url = objectUrl
       if (el) {
         el.pause()
         el.removeAttribute('src')
         el.load()
       }
-      URL.revokeObjectURL(objectUrl)
+      // load() restarts בחירת המקור במשימה נפרדת, ובמצב תנועה מצומצמת גם קפיצה
+      // בזמן עדיין באוויר. ביטול ה-blob באותו tick שומט אותו מתחת לבקשה שרצה,
+      // וזו נרשמת ככישלון — אז משחררים אותו רק אחרי שהאלמנט הספיק להתנתק.
+      setTimeout(() => URL.revokeObjectURL(url), 0)
     }
   }, [])
 
@@ -381,7 +385,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
 
   /* ---------- משיכת הידית ---------- */
 
-  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (phase === 'revealed') {
       handoff() // התאריך כבר על המסך — נגיעה מקצרת את ההמתנה
       return
@@ -416,7 +420,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     setPull(Math.max(pull.current, 0.045)) // תגובה כבר על הלחיצה
   }
 
-  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const d = drag.current
     if (!d || e.pointerId !== d.id) return
     const dy = e.clientY - d.y0
@@ -426,7 +430,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     setPull(Math.max(0, 0.045 + dy / TRAVEL))
   }
 
-  const endDrag = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
     const d = drag.current
     if (!d || e.pointerId !== d.id) return
     drag.current = null
@@ -452,10 +456,41 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     }
   }
 
+  /** בלי מקלדת אי אפשר היה לעבור את מסך הפתיחה בכלל — Enter/רווח מושכים בידית */
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    if (phase === 'revealed') {
+      handoff()
+      return
+    }
+    if (phase === 'spinning') {
+      const v = videoRef.current
+      if (v) v.playbackRate = 2.6
+      return
+    }
+    if (drag.current || anim.current) return
+    animateTo(1, 210, startSpin)
+  }
+
   const revealed = phase === 'revealed'
 
   return (
-    <motion.div className="slot-screen" exit={{ y: '-100%' }} transition={{ type: 'spring', bounce: 0, duration: 0.55 }}>
+    <motion.div
+      className="slot-screen"
+      exit={{ y: '-100%' }}
+      transition={{ type: 'spring', bounce: 0, duration: 0.55 }}
+      // אצבע על כל מקום במסך מפעילה את המכונה — לא צריך לפגוע בידית עצמה
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onKeyDown={onKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label="משכו בידית לגילוי תאריך החתונה"
+      style={{ cursor: revealed ? 'default' : pulling ? 'grabbing' : 'grab' }}
+    >
       <div className="slot-col">
         <header className="slot-head">
           <p className="slot-eyebrow font-serif2 italic" dir="ltr">
@@ -483,21 +518,12 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
               animate={{ opacity: !ready ? 0.28 : pulling || phase === 'spinning' ? 0.3 : 1 }}
               transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
             >
-              משכו בידית לגילוי התאריך
+              משכו בידית — או הקישו במסך
             </motion.p>
           )}
         </div>
 
-        <button
-          ref={stageRef}
-          className="slot-stage"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          aria-label="משכו בידית לגילוי תאריך החתונה"
-          style={{ cursor: revealed ? 'default' : pulling ? 'grabbing' : 'grab' }}
-        >
+        <div ref={stageRef} className="slot-stage" aria-hidden="true">
           <canvas ref={machineRef} className="slot-media" aria-hidden="true" />
           <video
             ref={videoRef}
@@ -515,7 +541,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
             <source src={media('machine/spin.mp4')} type='video/mp4; codecs="avc1.640028"' />
             <source src={media('machine/spin.webm')} type='video/webm; codecs="vp9"' />
           </video>
-        </button>
+        </div>
       </div>
       <canvas ref={confettiRef} className="slot-confetti" aria-hidden="true" />
     </motion.div>

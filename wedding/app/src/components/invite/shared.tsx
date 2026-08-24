@@ -14,15 +14,20 @@ export function FadeUp({
   y = 30,
   className,
   style,
+  /* the default asks an element to sit 12% inside the viewport before it
+     reveals. The last block on the page can never do that — scrolled all the
+     way down it still sits in the bottom band — so it has to opt out. */
+  margin = '-12% 0px',
 }: {
   children: ReactNode
   delay?: number
   y?: number
   className?: string
   style?: CSSProperties
+  margin?: `${number}px` | `${number}% ${number}px` | `-${number}% ${number}px`
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-12% 0px' })
+  const inView = useInView(ref, { once: true, margin })
   return (
     <motion.div
       ref={ref}
