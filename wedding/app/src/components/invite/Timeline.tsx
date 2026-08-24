@@ -1,7 +1,7 @@
 import { Eyebrow, FadeUp } from './shared'
 import { SCHEDULE } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
-import { Flourish } from './Flourish'
+import { Flourish, ScheduleVine } from './Flourish'
 import { Botanical, PressedBotanicals, type BotanicalName } from './Botanicals'
 
 /**
@@ -54,11 +54,16 @@ export default function Timeline() {
             <Eyebrow>The Evening</Eyebrow>
           </FadeUp>
           <FadeUp delay={0.08}>
-            <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '10px 0 20px', color: 'var(--champ2)' }}>
+            <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '10px 0 10px', color: 'var(--champ2)' }}>
               הערב שלנו, שלב אחרי שלב
             </h2>
           </FadeUp>
         </div>
+
+        {/* the connector the schedule asked for, as a stem rather than a rule */}
+        <FadeUp delay={0.1}>
+          <ScheduleVine colors={STAGES.map((s) => s.color)} />
+        </FadeUp>
 
         <ol
           className="grid"

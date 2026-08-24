@@ -139,6 +139,63 @@ export function GarlandDivider({ width = 260 }: { width?: number }) {
   )
 }
 
+/**
+ * The stem that runs the length of the schedule, in place of a rail with dots.
+ * It waves between the three stages and carries a five-petal bloom over the
+ * middle of each card, so the blooms sit exactly above the seals below them.
+ *
+ * `colors` arrives in reading order, and Hebrew reads right to left, so the
+ * first stage takes the rightmost bloom. SVG coordinates do not flip with
+ * `dir`, so the order is reversed here rather than in the markup.
+ */
+export function ScheduleVine({ colors }: { colors: readonly string[] }) {
+  const CY = 26
+  const at = [750, 450, 150] // bloom centres, right to left
+  const leaves: [number, number, number][] = [
+    // x, y, rotation — one at the middle of each crest and trough of the wave
+    [79, 19, -16], [223, 33, 14], [377, 19, -12], [523, 33, 16], [677, 19, -14], [821, 33, 12],
+  ]
+  /* drawn heavy for its box on purpose: the stem spans the full width of the
+     schedule, so on a phone it renders about 18px tall and anything finer than
+     this disappears */
+  return (
+    <svg
+      viewBox="0 0 900 52"
+      fill="none"
+      aria-hidden="true"
+      style={{ display: 'block', width: '100%', height: 'auto', margin: '0 auto' }}
+    >
+      {/* one stem, one colour — the blooms carry the stage colours */}
+      <path
+        d={`M8 ${CY} Q79 12 150 ${CY} T300 ${CY} T450 ${CY} T600 ${CY} T750 ${CY} T892 ${CY}`}
+        stroke={STEM}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        opacity="0.75"
+      />
+      {leaves.map(([x, y, r], i) => (
+        <ellipse key={i} cx={x} cy={y} rx="15" ry="5.5" transform={`rotate(${r} ${x} ${y})`} fill={STEM} opacity="0.55" />
+      ))}
+      {at.map((x, i) => {
+        const c = colors[i] ?? BLOSSOM
+        return (
+          <g key={x}>
+            <circle cx={x} cy={CY - 6.5} r="7" fill={c} opacity="0.9" />
+            <circle cx={x - 7} cy={CY - 1.5} r="7" fill={c} opacity="0.9" />
+            <circle cx={x + 7} cy={CY - 1.5} r="7" fill={c} opacity="0.9" />
+            <circle cx={x - 4.4} cy={CY + 6} r="7" fill={c} opacity="0.9" />
+            <circle cx={x + 4.4} cy={CY + 6} r="7" fill={c} opacity="0.9" />
+            <circle cx={x} cy={CY} r="4.2" fill={GOLD} />
+          </g>
+        )
+      })}
+      {/* the stem carries on past the outer blooms rather than stopping dead */}
+      <circle cx="8" cy={CY} r="4" fill={CORAL} opacity="0.8" />
+      <circle cx="892" cy={CY} r="4" fill={CORAL} opacity="0.8" />
+    </svg>
+  )
+}
+
 /** tiny painted disco ball on a string */
 export function MiniDiscoBall({ size = 34 }: { size?: number }) {
   return (
