@@ -9,9 +9,7 @@ import { FlickerText } from '@/components/vendor/flicker-text'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { MiniDiscoBall, SideVine } from './Flourish'
 import { PressedBotanicals } from './Botanicals'
-import { COUPLE, COUPLE_EN, ADDR, VENUE, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
-
-const MARQ = 'SHACHAF & TOMER — 28 . 10 . 2026 — TEL AVIV — '
+import { COUPLE, COUPLE_EN, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
 
 export default function Hero() {
   const rm = useReducedMotion()
@@ -38,7 +36,7 @@ export default function Hero() {
   return (
     <header
       className="relative flex flex-col items-center justify-center text-center overflow-hidden"
-      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(100dvh, 560px)', padding: '28px 20px 30px' })}
+      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(80dvh, 440px)', padding: '18px 20px 58px' })}
     >
       <PressedBotanicals set="hero" />
       {!rm && <Particles className="absolute inset-0" quantity={80} color="#c4768f" ease={70} staticity={40} size={0.5} />}
@@ -176,45 +174,22 @@ export default function Hero() {
           </HyperText>
           {!rm && <BorderBeam size={56} duration={7} colorFrom="var(--champ)" colorTo="var(--blush)" />}
         </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1.3 }}
-          style={{ color: 'var(--muted)', marginTop: 16, fontSize: '0.98rem' }}
-        >
-          {VENUE} · {ADDR}
-        </motion.p>
       </motion.div>
 
       <motion.div
         className="absolute flex flex-col items-center"
-        style={{ bottom: 86, left: '50%', translateX: '-50%', opacity: fade }}
+        style={{ bottom: 16, left: '50%', translateX: '-50%', opacity: fade }}
         aria-hidden="true"
       >
         <span style={{ color: 'var(--muted)', fontSize: '0.75rem', letterSpacing: '0.2em' }}>גללו</span>
-        <div style={{ width: 1, height: 44, overflow: 'hidden', marginTop: 8 }}>
+        <div style={{ width: 1, height: 34, overflow: 'hidden', marginTop: 6 }}>
           <motion.div
-            style={{ width: 1, height: 44, background: 'var(--champ)' }}
+            style={{ width: 1, height: 34, background: 'var(--champ)' }}
             animate={rm ? undefined : { y: ['-100%', '100%'] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         </div>
       </motion.div>
-
-      <div className="marquee absolute bottom-0 left-0 right-0 py-4" style={{ borderTop: '1px solid var(--line)' }}>
-        <div className="marquee__track">
-          {[0, 1].map((k) => (
-            <span
-              key={k}
-              className="font-serif2"
-              style={{ fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.34em', color: 'var(--champ)', opacity: 0.5 }}
-            >
-              {MARQ.repeat(4)}
-            </span>
-          ))}
-        </div>
-      </div>
     </header>
   )
 }

@@ -419,6 +419,16 @@ body.locked {
   /* שטוח בכוונה: הרקע של המכונה נצרב בדיוק בצבע הזה, אז כל גרדיאנט כאן
      היה מסגיר את גבולות המדיה */
   background: var(--bg);
+  /* המסך כולו הוא הידית: נגיעה בכל מקום מפעילה את המכונה, ולכן הדפדפן
+     לא אמור לפרש גרירה אנכית כאן כגלילה */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.slot-screen:focus-visible {
+  outline: 2px solid var(--champ);
+  outline-offset: -4px;
 }
 .slot-col {
   max-width: 460px;

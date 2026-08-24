@@ -1,12 +1,12 @@
 import { FadeUp } from './shared'
-import { VENUE, ADDR, DATE_LABEL } from '@/lib/wedding'
+import { DATE_LABEL } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { CornerSpray } from './Flourish'
 import { PressedBotanicals } from './Botanicals'
 
 export default function Finale() {
   return (
-    <footer className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: '26px 20px 44px' })}>
+    <footer className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: '22px 20px 32px' })}>
       <PressedBotanicals set="finale" />
       <div className="absolute pointer-events-none" style={{ bottom: 8, insetInlineStart: 8, opacity: 0.85 }} aria-hidden="true">
         <CornerSpray size={76} flipY />
@@ -14,7 +14,7 @@ export default function Finale() {
       <div className="absolute pointer-events-none" style={{ bottom: 8, insetInlineEnd: 8, opacity: 0.85 }} aria-hidden="true">
         <CornerSpray size={76} flip flipY />
       </div>
-      <FadeUp delay={0.18}>
+      <FadeUp delay={0.18} margin="0px">
         <div
           className="flex justify-center flex-wrap font-serif2"
           dir="ltr"
@@ -31,11 +31,9 @@ export default function Finale() {
             letterSpacing: '0.3em',
           }}
         >
+          {/* the venue section right above owns the address — this is a sign-off */}
           <span>SHACHAF &amp; TOMER</span>
           <span className="tabular">{DATE_LABEL}</span>
-          <span dir="rtl" style={{ letterSpacing: '0.12em', fontFamily: 'var(--font-body)' }}>
-            {VENUE} · {ADDR}
-          </span>
         </div>
         {/* קרדיט לסילואטים הבוטניים — נדרש ברישיון CC BY 3.0 */}
         <p

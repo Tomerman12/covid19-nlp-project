@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Eyebrow, FadeUp } from './shared'
 import { FlickeringGrid } from '@/components/vendor/flickering-grid'
-import { TARGET_TS, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
+import { TARGET_TS } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
-import { Flourish, CornerSpray } from './Flourish'
-import { PressedBotanicals, SprigRow } from './Botanicals'
+import { PressedBotanicals } from './Botanicals'
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -90,45 +89,27 @@ export default function Countdown() {
         masked
       />
       <PressedBotanicals set="countdown" />
-      <div className="absolute pointer-events-none" style={{ top: 8, insetInlineStart: 8, opacity: 0.85 }} aria-hidden="true">
-        <CornerSpray size={70} />
-      </div>
-      <div className="absolute pointer-events-none" style={{ top: 8, insetInlineEnd: 8, opacity: 0.85 }} aria-hidden="true">
-        <CornerSpray size={70} flip />
-      </div>
       <div className="relative mx-auto" style={{ zIndex: 1, maxWidth: '48rem' }}>
+      {/* a slim band, not a full section: the date already led the hero, so this
+          only has to answer "how long?" */}
       <FadeUp>
-        <Flourish color="#e58c54" />
         <Eyebrow>Counting Down</Eyebrow>
-        <SprigRow color="#e58c54" />
-      </FadeUp>
-      <FadeUp delay={0.08}>
-        <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '14px 0 8px', color: 'var(--champ2)' }}>
-          עוד רגע אנחנו שם
-        </h2>
       </FadeUp>
 
       {left <= 0 ? (
-        <p className="font-display" style={{ fontWeight: 900, fontSize: 'clamp(1.5rem, 5vw, 2.1rem)', color: 'var(--champ)', marginTop: 22 }}>
+        <p className="font-display" style={{ fontWeight: 900, fontSize: 'clamp(1.5rem, 5vw, 2.1rem)', color: 'var(--champ)', marginTop: 16 }}>
           זה קורה עכשיו! 🎉
         </p>
       ) : (
-        <>
-          <FadeUp delay={0.16}>
-            {/* a countdown reads like a clock: always left-to-right, days first */}
-            <div dir="ltr" className="flex justify-center flex-wrap" style={{ gap: 'clamp(8px, 2.4vw, 16px)', marginTop: 26 }}>
-              <Unit value={d} label="ימים" />
-              <Unit value={h} label="שעות" />
-              <Unit value={m} label="דקות" />
-              <Unit value={s} label="שניות" />
-            </div>
-          </FadeUp>
-          <FadeUp delay={0.24}>
-            <p style={{ color: 'var(--muted)', marginTop: 22, fontSize: '0.95rem' }}>
-              {DAY_LABEL}, <span dir="ltr" className="tabular">{DATE_LABEL}</span>, החל מ־<span dir="ltr" className="tabular">{TIME_LABEL}</span>
-            </p>
-          </FadeUp>
-        </>
+        <FadeUp delay={0.1}>
+          {/* a countdown reads like a clock: always left-to-right, days first */}
+          <div dir="ltr" className="flex justify-center flex-wrap" style={{ gap: 'clamp(8px, 2.4vw, 16px)', marginTop: 14 }}>
+            <Unit value={d} label="ימים" />
+            <Unit value={h} label="שעות" />
+            <Unit value={m} label="דקות" />
+            <Unit value={s} label="שניות" />
+          </div>
+        </FadeUp>
       )}
       </div>
     </section>
