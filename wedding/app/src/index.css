@@ -484,14 +484,21 @@ body.locked {
 }
 .slot-names {
   margin: 2px 0 0;
-  font-weight: 900;
-  font-size: clamp(2rem, 7.6vw, 3.1rem);
-  line-height: 1.14;
-  letter-spacing: -0.015em;
+  /* Great Vibes ships one weight, 400. Asking for 900 made the browser
+     synthesise the bold by smearing the strokes, which is fatal to a
+     high-contrast script, and the negative tracking pushed the already
+     joined letters into each other. Set in the invitation's serif instead,
+     at a weight the family actually carries — the same face the share card
+     uses for these two names. */
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 9vw, 3.6rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
   color: var(--ivory);
 }
 .slot-amp {
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: normal;
   color: var(--champ);
 }

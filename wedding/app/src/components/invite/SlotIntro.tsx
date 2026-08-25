@@ -496,7 +496,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
           <p className="slot-eyebrow font-serif2 italic" dir="ltr">
             the wedding of
           </p>
-          <h1 className="slot-names font-script" dir="ltr">
+          <h1 className="slot-names" dir="ltr">
             {COUPLE_EN.one} <span className="slot-amp">&amp;</span> {COUPLE_EN.two}
           </h1>
         </header>
