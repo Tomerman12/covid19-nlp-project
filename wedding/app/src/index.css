@@ -54,7 +54,10 @@ body.locked {
 }
 
 .party {
-  --marq-dur: 7s;
+  /* the ribbon picks up when the party starts, but at 7s it was a blur and
+     nobody could read the details off it. Still clearly quicker than the 26s
+     it runs at otherwise. */
+  --marq-dur: 16s;
 }
 
 @media (pointer: fine) {
