@@ -82,29 +82,26 @@ const SETS: Record<string, Sprinkle[]> = {
     { name: 'wheat', size: 54, color: CORAL, opacity: 0.26, rotate: 14, flip: true, pos: { bottom: 30, insetInlineEnd: 12 } },
     { name: 'three_leaves', size: 34, color: STEM, opacity: 0.3, rotate: -24, pos: { bottom: 96, insetInlineEnd: 46 } },
   ],
+  /* Sections lost a lot of height this pass, so sprinkles that used to sit
+     comfortably apart at fixed pixel offsets began landing on each other and
+     on the corner sprays. Each set below keeps its pieces on opposite corners,
+     and sections that already carry CornerSpray do not also get a sprinkle in
+     that corner. */
   countdown: [
-    { name: 'cotton_flower', size: 48, color: BLOSSOM, opacity: 0.3, rotate: -12, pos: { top: 84, insetInlineEnd: 16 } },
-    { name: 'falling_leaf', size: 34, color: STEM, opacity: 0.32, rotate: 22, pos: { top: 150, insetInlineStart: 18 } },
-    { name: 'dandelion_flower', size: 40, color: PERI, opacity: 0.26, rotate: 0, pos: { bottom: 40, insetInlineStart: 34 } },
-    { name: 'linden_leaf', size: 38, color: STEM, opacity: 0.28, rotate: -30, flip: true, pos: { bottom: 62, insetInlineEnd: 30 } },
+    { name: 'cotton_flower', size: 44, color: BLOSSOM, opacity: 0.28, rotate: -12, pos: { top: 8, insetInlineEnd: 12 } },
+    { name: 'falling_leaf', size: 32, color: STEM, opacity: 0.3, rotate: 22, pos: { bottom: 10, insetInlineStart: 14 } },
   ],
   timeline: [
-    { name: 'vine_flower', size: 46, color: BLOSSOM, opacity: 0.26, rotate: 0, pos: { top: 40, insetInlineEnd: 14 } },
-    { name: 'ginkgo_leaf', size: 36, color: STEM, opacity: 0.3, rotate: 18, pos: { top: 120, insetInlineStart: 16 } },
-    { name: 'flowers', size: 52, color: CORAL, opacity: 0.24, rotate: -8, pos: { bottom: 34, insetInlineStart: 22 } },
-    { name: 'olive', size: 50, color: STEM, opacity: 0.3, rotate: 160, pos: { bottom: 80, insetInlineEnd: 18 } },
+    { name: 'vine_flower', size: 42, color: BLOSSOM, opacity: 0.24, rotate: 0, pos: { top: 8, insetInlineEnd: 10 } },
+    { name: 'ginkgo_leaf', size: 34, color: STEM, opacity: 0.28, rotate: 18, pos: { bottom: 10, insetInlineStart: 12 } },
   ],
   venue: [
-    { name: 'curling_vines', size: 58, color: STEM, opacity: 0.22, rotate: 0, pos: { top: 30, insetInlineStart: 12 } },
-    { name: 'daisy', size: 34, color: PERI, opacity: 0.3, rotate: -14, pos: { top: 108, insetInlineEnd: 22 } },
-    { name: 'wheat', size: 50, color: CORAL, opacity: 0.24, rotate: -12, pos: { bottom: 36, insetInlineEnd: 28 } },
-    { name: 'three_leaves', size: 32, color: STEM, opacity: 0.3, rotate: 28, flip: true, pos: { bottom: 92, insetInlineStart: 26 } },
+    { name: 'curling_vines', size: 52, color: STEM, opacity: 0.22, rotate: 0, pos: { top: 8, insetInlineStart: 4 } },
+    { name: 'daisy', size: 30, color: PERI, opacity: 0.3, rotate: -14, pos: { top: 10, insetInlineEnd: 6 } },
   ],
   finale: [
-    { name: 'flowers', size: 58, color: BLOSSOM, opacity: 0.26, rotate: 10, pos: { top: 24, insetInlineStart: 16 } },
-    { name: 'cotton_flower', size: 44, color: CORAL, opacity: 0.26, rotate: -16, pos: { top: 70, insetInlineEnd: 20 } },
-    { name: 'olive', size: 56, color: STEM, opacity: 0.3, rotate: 200, flip: true, pos: { bottom: 26, insetInlineStart: 30 } },
-    { name: 'daisy', size: 32, color: PERI, opacity: 0.28, rotate: 20, pos: { bottom: 74, insetInlineEnd: 34 } },
+    { name: 'flowers', size: 50, color: BLOSSOM, opacity: 0.26, rotate: 10, pos: { top: 6, insetInlineStart: 10 } },
+    { name: 'cotton_flower', size: 40, color: CORAL, opacity: 0.26, rotate: -16, pos: { top: 8, insetInlineEnd: 14 } },
   ],
   hero: [
     { name: 'olive', size: 64, color: STEM, opacity: 0.3, rotate: 150, pos: { bottom: 120, insetInlineStart: 8 } },

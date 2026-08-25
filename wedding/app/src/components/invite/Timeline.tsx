@@ -2,7 +2,7 @@ import { Eyebrow, FadeUp } from './shared'
 import { SCHEDULE } from '@/lib/wedding'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { Flourish, ScheduleVine, StemLink } from './Flourish'
-import { Botanical, PressedBotanicals, type BotanicalName } from './Botanicals'
+import { Botanical, type BotanicalName } from './Botanicals'
 
 /**
  * The evening, printed on the paper rather than boxed into cards.
@@ -51,7 +51,6 @@ function PressedSeal({ plant, color, tilt }: { plant: BotanicalName; color: stri
 export default function Timeline() {
   return (
     <section className="relative" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(16px, 2.2vh, 26px) 18px' })}>
-      <PressedBotanicals set="timeline" />
       <div className="mx-auto" style={{ maxWidth: '56rem' }}>
         <div className="text-center">
           <FadeUp>

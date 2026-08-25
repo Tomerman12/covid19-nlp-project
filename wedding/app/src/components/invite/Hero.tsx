@@ -109,10 +109,21 @@ export default function Hero() {
         <SideVine flip height={150} />
       </motion.div>
 
-      <motion.div style={{ opacity: fade }} className="relative">
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.05 }}>
-          <MiniDiscoBall />
+      {/* hung from the top of the hero rather than floating in the middle of
+          the stack, the way the party-mode ball drops from the top of the
+          viewport. The wrapper carries the scroll fade so it cannot fight the
+          entry animation on the inner element. */}
+      <motion.div
+        className="absolute pointer-events-none"
+        aria-hidden="true"
+        style={{ top: 0, left: '50%', translateX: '-50%', opacity: fade }}
+      >
+        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.05 }}>
+          <MiniDiscoBall cord={34} />
         </motion.div>
+      </motion.div>
+
+      <motion.div style={{ opacity: fade }} className="relative">
         <motion.p
           className="font-serif2 italic"
           dir="ltr"

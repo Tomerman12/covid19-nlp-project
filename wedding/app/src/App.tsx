@@ -8,7 +8,6 @@ import Venue from './components/invite/Venue'
 import Finale from './components/invite/Finale'
 import PartyLayer from './components/invite/PartyLayer'
 import Cursor from './components/invite/Cursor'
-import { ScrollProgress } from './components/vendor/scroll-progress'
 
 type Phase = 'loading' | 'site'
 
@@ -35,7 +34,6 @@ export default function App() {
 
       {phase === 'site' && (
         <main>
-          <ScrollProgress />
           <Hero />
           <Countdown />
           <Timeline />

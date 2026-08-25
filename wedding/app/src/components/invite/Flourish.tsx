@@ -217,23 +217,29 @@ export function StemLink({ height = 34 }: { height?: number }) {
 }
 
 /** tiny painted disco ball on a string */
-export function MiniDiscoBall({ size = 34 }: { size?: number }) {
+export function MiniDiscoBall({ size = 34, cord = 9 }: { size?: number; cord?: number }) {
+  /* the cord grows upward from the ball, so a longer one lets the ball hang
+     from the top edge of whatever holds it instead of floating in the middle */
+  const shift = cord - 9
+  const h = 48 + shift
   return (
     <svg
       width={size}
-      height={size * 1.4}
-      viewBox="0 0 34 48"
+      height={(size * h) / 34}
+      viewBox={`0 0 34 ${h}`}
       fill="none"
       aria-hidden="true"
-      style={{ display: 'block', margin: '0 auto 8px' }}
+      style={{ display: 'block', margin: '0 auto' }}
     >
-      <path d="M17 0v9" stroke="#b98a3c" strokeWidth="1.3" strokeLinecap="round" />
-      <circle cx="17" cy="26" r="15" fill="#f3b04b" />
-      <circle cx="17" cy="26" r="15" fill="url(#miniShade)" />
-      <path d="M17 11v30M2.6 22h28.8M4 32h26M4.6 17.5h24.8" stroke="#c77e28" strokeWidth="1" opacity="0.75" />
-      <path d="M8 13.6c5.4 4.2 12.6 4.2 18 0M8 38.4c5.4-4.2 12.6-4.2 18 0" stroke="#c77e28" strokeWidth="1" opacity="0.75" />
-      <circle cx="11.5" cy="19" r="2.4" fill="#ffe6b3" opacity="0.95" />
-      <path d="M28 6.5l1.1 2.4 2.4 1.1-2.4 1.1-1.1 2.4-1.1-2.4-2.4-1.1 2.4-1.1z" fill="#e8b45c" />
+      <path d={`M17 0v${cord}`} stroke="#b98a3c" strokeWidth="1.3" strokeLinecap="round" />
+      <g transform={`translate(0 ${shift})`}>
+        <circle cx="17" cy="26" r="15" fill="#f3b04b" />
+        <circle cx="17" cy="26" r="15" fill="url(#miniShade)" />
+        <path d="M17 11v30M2.6 22h28.8M4 32h26M4.6 17.5h24.8" stroke="#c77e28" strokeWidth="1" opacity="0.75" />
+        <path d="M8 13.6c5.4 4.2 12.6 4.2 18 0M8 38.4c5.4-4.2 12.6-4.2 18 0" stroke="#c77e28" strokeWidth="1" opacity="0.75" />
+        <circle cx="11.5" cy="19" r="2.4" fill="#ffe6b3" opacity="0.95" />
+        <path d="M28 6.5l1.1 2.4 2.4 1.1-2.4 1.1-1.1 2.4-1.1-2.4-2.4-1.1 2.4-1.1z" fill="#e8b45c" />
+      </g>
       <defs>
         <radialGradient id="miniShade" cx="0.35" cy="0.3" r="1">
           <stop offset="0" stopColor="#ffffff" stopOpacity="0.55" />
