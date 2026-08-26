@@ -54,7 +54,7 @@ export default function Hero() {
       </div>
     <header
       className="relative flex flex-col items-center justify-center text-center overflow-hidden"
-      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(78dvh, 412px)', padding: '14px 20px 56px' })}
+      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(74dvh, 372px)', padding: '14px 20px 18px' })}
     >
       <PressedBotanicals set="hero" />
       {!rm && <Particles className="absolute inset-0" quantity={80} color="#c4768f" ease={70} staticity={40} size={0.5} />}
@@ -205,20 +205,6 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      <motion.div
-        className="absolute flex flex-col items-center"
-        style={{ bottom: 16, left: '50%', translateX: '-50%', opacity: fade }}
-        aria-hidden="true"
-      >
-        <span style={{ color: 'var(--muted)', fontSize: '0.75rem', letterSpacing: '0.2em' }}>גללו</span>
-        <div style={{ width: 1, height: 34, overflow: 'hidden', marginTop: 6 }}>
-          <motion.div
-            style={{ width: 1, height: 34, background: 'var(--champ)' }}
-            animate={rm ? undefined : { y: ['-100%', '100%'] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </div>
-      </motion.div>
     </header>
     </>
   )

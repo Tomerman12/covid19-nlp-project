@@ -50,7 +50,7 @@ function PressedSeal({ plant, color, tilt }: { plant: BotanicalName; color: stri
 
 export default function Timeline() {
   return (
-    <section className="relative" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(16px, 2.2vh, 26px) 18px' })}>
+    <section className="relative" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(12px, 1.6vh, 20px) 18px' })}>
       <div className="mx-auto" style={{ maxWidth: '56rem' }}>
         <div className="text-center">
           <FadeUp>

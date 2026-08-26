@@ -300,15 +300,26 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       // בזמן הפירוק ונרשמת בקשה שנכשלה
       const el = videoRef.current
       const url = objectUrl
-      if (el) {
-        el.pause()
-        el.removeAttribute('src')
-        el.load()
+      if (!el) {
+        URL.revokeObjectURL(url)
+        return
       }
-      // load() restarts בחירת המקור במשימה נפרדת, ובמצב תנועה מצומצמת גם קפיצה
-      // בזמן עדיין באוויר. ביטול ה-blob באותו tick שומט אותו מתחת לבקשה שרצה,
-      // וזו נרשמת ככישלון — אז משחררים אותו רק אחרי שהאלמנט הספיק להתנתק.
-      setTimeout(() => URL.revokeObjectURL(url), 0)
+      // דחייה במשימה אחת לא הספיקה: לפעמים קפיצה בזמן עוד רצה כשה-blob בוטל,
+      // והבקשה נרשמה ככישלון. `load()` על אלמנט בלי src מרוקן אותו ומשגר
+      // `emptied` — זה הרגע שבו הוא באמת שחרר את הקובץ, אז מחכים לו.
+      let done = false
+      const release = () => {
+        if (done) return
+        done = true
+        el.removeEventListener('emptied', release)
+        window.clearTimeout(fallback)
+        URL.revokeObjectURL(url)
+      }
+      const fallback = window.setTimeout(release, 2000)
+      el.addEventListener('emptied', release)
+      el.pause()
+      el.removeAttribute('src')
+      el.load()
     }
   }, [])
 
