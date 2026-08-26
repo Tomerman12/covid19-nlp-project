@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
 import { MACHINE_VERSION } from '@/lib/machineVersion'
 import { ConfettiEngine } from '@/lib/confetti'
+import SlotPhotos from './SlotPhotos'
 
 /* ---------------------------------------------------------------------------
  * מסך הפתיחה: מכונת המזל.
@@ -502,6 +503,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       aria-label="משכו בידית לגילוי תאריך החתונה"
       style={{ cursor: revealed ? 'default' : pulling ? 'grabbing' : 'grab' }}
     >
+      <SlotPhotos />
       <div className="slot-col">
         <header className="slot-head">
           <p className="slot-eyebrow font-serif2 italic" dir="ltr">
