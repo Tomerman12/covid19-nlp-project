@@ -107,8 +107,8 @@ const SETS: Record<string, Sprinkle[]> = {
      stay low; a third one at bottom: 190 landed inside the left vine once the
      hero lost 40px of height */
   hero: [
-    { name: 'olive', size: 64, color: STEM, opacity: 0.3, rotate: 150, pos: { bottom: 120, insetInlineStart: 8 } },
-    { name: 'wheat', size: 56, color: CORAL, opacity: 0.24, rotate: 8, flip: true, pos: { bottom: 132, insetInlineEnd: 10 } },
+    { name: 'olive', size: 54, color: STEM, opacity: 0.3, rotate: 150, pos: { bottom: 6, insetInlineStart: 6 } },
+    { name: 'wheat', size: 48, color: CORAL, opacity: 0.24, rotate: 8, flip: true, pos: { bottom: 8, insetInlineEnd: 8 } },
   ],
 }
 
