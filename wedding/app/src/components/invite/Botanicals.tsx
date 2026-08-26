@@ -103,10 +103,12 @@ const SETS: Record<string, Sprinkle[]> = {
     { name: 'flowers', size: 50, color: BLOSSOM, opacity: 0.26, rotate: 10, pos: { top: 6, insetInlineStart: 10 } },
     { name: 'cotton_flower', size: 40, color: CORAL, opacity: 0.26, rotate: -16, pos: { top: 8, insetInlineEnd: 14 } },
   ],
+  /* the side vines own the top ~200px of both edges, so the hero's sprinkles
+     stay low; a third one at bottom: 190 landed inside the left vine once the
+     hero lost 40px of height */
   hero: [
     { name: 'olive', size: 64, color: STEM, opacity: 0.3, rotate: 150, pos: { bottom: 120, insetInlineStart: 8 } },
     { name: 'wheat', size: 56, color: CORAL, opacity: 0.24, rotate: 8, flip: true, pos: { bottom: 132, insetInlineEnd: 10 } },
-    { name: 'daisy', size: 28, color: BLOSSOM, opacity: 0.3, rotate: -10, pos: { bottom: 190, insetInlineStart: 44 } },
   ],
 }
 

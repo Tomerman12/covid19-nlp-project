@@ -31,7 +31,7 @@ function Pin() {
 export default function Venue() {
   const rm = useReducedMotion()
   return (
-    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(18px, 2.4vh, 28px) 22px' })}>
+    <section className="relative text-center" style={flavorStyle(FLAVORS.blossom, { padding: 'clamp(12px, 1.6vh, 20px) 22px' })}>
       <PressedBotanicals set="venue" />
       <div className="mx-auto" style={{ maxWidth: '46rem' }}>
       <FadeUp>
@@ -40,7 +40,7 @@ export default function Venue() {
         <SprigRow color="#8fa3e8" />
       </FadeUp>
       <FadeUp delay={0.08}>
-        <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '10px 0 18px', color: 'var(--champ2)' }}>
+        <h2 className="font-display text-balance" style={{ fontWeight: 900, fontSize: 'clamp(1.9rem, 6.4vw, 2.7rem)', margin: '8px 0 12px', color: 'var(--champ2)' }}>
           איך מגיעים אלינו?
         </h2>
       </FadeUp>
