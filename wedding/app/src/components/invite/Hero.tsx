@@ -9,7 +9,7 @@ import { FlickerText } from '@/components/vendor/flicker-text'
 import { FLAVORS, flavorStyle } from '@/lib/flavors'
 import { MiniDiscoBall, SideVine } from './Flourish'
 import { PressedBotanicals } from './Botanicals'
-import { COUPLE, COUPLE_EN, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
+import { COUPLE_EN, DATE_LABEL, DAY_LABEL, TIME_LABEL } from '@/lib/wedding'
 
 const MARQ = 'SHACHAF & TOMER — 28 . 10 . 2026 — TEL AVIV — '
 
@@ -54,7 +54,7 @@ export default function Hero() {
       </div>
     <header
       className="relative flex flex-col items-center justify-center text-center overflow-hidden"
-      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(74dvh, 372px)', padding: '14px 20px 18px' })}
+      style={flavorStyle(FLAVORS.blossom, { minHeight: 'min(58dvh, 296px)', padding: '12px 20px 16px' })}
     >
       <PressedBotanicals set="hero" />
       {!rm && <Particles className="absolute inset-0" quantity={80} color="#c4768f" ease={70} staticity={40} size={0.5} />}
@@ -96,7 +96,7 @@ export default function Hero() {
         transition={{ duration: 1.2, delay: 0.7 }}
         style={{ top: 'clamp(12px, 4vh, 44px)', insetInlineStart: 'clamp(6px, 2.5vw, 36px)' }}
       >
-        <SideVine height={150} />
+        <SideVine height={112} />
       </motion.div>
       <motion.div
         className="absolute pointer-events-none"
@@ -106,7 +106,7 @@ export default function Hero() {
         transition={{ duration: 1.2, delay: 0.85 }}
         style={{ top: 'clamp(12px, 4vh, 44px)', insetInlineEnd: 'clamp(6px, 2.5vw, 36px)' }}
       >
-        <SideVine flip height={150} />
+        <SideVine flip height={112} />
       </motion.div>
 
       {/* hung from the top of the hero rather than floating in the middle of
@@ -119,7 +119,7 @@ export default function Hero() {
         style={{ top: 0, left: '50%', translateX: '-50%', opacity: fade }}
       >
         <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.05 }}>
-          <MiniDiscoBall cord={34} />
+          <MiniDiscoBall cord={20} />
         </motion.div>
       </motion.div>
 
@@ -164,15 +164,6 @@ export default function Hero() {
           <FlickerText delay={550} duration={1400}>{COUPLE_EN.two}</FlickerText>
         </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 1.0 }}
-          style={{ color: 'var(--muted)', fontSize: 'clamp(1rem, 3.4vw, 1.22rem)', letterSpacing: '0.05em' }}
-        >
-          {COUPLE.full} — מתחתנים, ואתם מוזמנים!
-        </motion.p>
-
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -182,7 +173,7 @@ export default function Hero() {
             gap: 14,
             border: '1px solid var(--line)',
             padding: '13px 28px',
-            marginTop: 26,
+            marginTop: 18,
             fontFamily: 'var(--font-display)',
             fontWeight: 500,
             fontSize: 'clamp(0.98rem, 3.4vw, 1.18rem)',
