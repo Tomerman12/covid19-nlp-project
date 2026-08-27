@@ -19,8 +19,8 @@ import rooftop from '@/assets/photos/rooftop.webp'
 /* The title owns the top of the screen and the machine owns the middle, so the
    snapshots hang in the four corners below the headline. */
 const SHOTS = [
-  { src: pizza, pos: { top: '24%', insetInlineStart: '1.5%' }, tilt: -7, delay: 0.15 },
-  { src: rooftop, pos: { top: '21%', insetInlineEnd: '1.5%' }, tilt: 6, delay: 0.3 },
+  { src: pizza, pos: { top: '30%', insetInlineStart: '1.5%' }, tilt: -7, delay: 0.15 },
+  { src: rooftop, pos: { top: '28%', insetInlineEnd: '1.5%' }, tilt: 6, delay: 0.3 },
   { src: party, pos: { bottom: '7%', insetInlineStart: '2.5%' }, tilt: 5, delay: 0.45 },
   { src: times, pos: { bottom: '10%', insetInlineEnd: '2.5%' }, tilt: -8, delay: 0.6 },
 ]
@@ -35,8 +35,8 @@ export default function SlotPhotos() {
           className="absolute"
           style={{
             ...s.pos,
-            width: 'clamp(58px, 17vw, 120px)',
-            padding: '5px 5px 12px',
+            width: 'clamp(88px, 24vw, 200px)',
+            padding: '6px 6px 15px',
             background: 'var(--bg2)',
             /* the paper edge and a shadow the colour of the page, not black */
             boxShadow: '0 8px 20px rgba(140,110,50,.22), 0 1px 0 rgba(255,255,255,.7) inset',

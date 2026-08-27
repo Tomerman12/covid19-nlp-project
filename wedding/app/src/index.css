@@ -26,9 +26,17 @@
 
 html {
   background: var(--bg);
+  /* `hidden` makes the viewport a scroll container that is merely hidden, and
+     iOS Safari will still let a finger pan it sideways to reveal whatever
+     overflows — which is the sideways scroll seen on a real phone even though
+     Chromium reports scrollWidth == clientWidth. `clip` is not scrollable at
+     all. `hidden` stays first as the fallback for Safari before 16. */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 body {
   margin: 0;
+  max-width: 100%;
   font-family: var(--font-body);
   color: var(--ivory);
   background:
@@ -36,6 +44,7 @@ body {
     radial-gradient(900px 700px at 50% 115%, #f3ead4, transparent 60%),
     var(--bg);
   overflow-x: hidden;
+  overflow-x: clip;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
