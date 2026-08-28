@@ -437,7 +437,17 @@ body.locked {
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  /* the slide-away runs as a compositor transition, so it finishes even
+     when the main thread is too busy to draw frames */
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.slot-screen--out {
+  transform: translateY(-100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .slot-screen { transition: none; }
+}
+
 /* מצב מסיבה: הכפתור הזה הוא הזמנה ללחוץ, לא הערת שוליים. מלא, לא זכוכית,
    עם טבעת שנפתחת החוצה כל כמה שניות כדי שהעין תמצא אותו. */
 .party-cta {

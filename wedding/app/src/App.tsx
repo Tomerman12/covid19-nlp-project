@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
 import SlotIntro from './components/invite/SlotIntro'
 import Hero from './components/invite/Hero'
 import Countdown from './components/invite/Countdown'
@@ -9,7 +8,10 @@ import Finale from './components/invite/Finale'
 import PartyLayer from './components/invite/PartyLayer'
 import Cursor from './components/invite/Cursor'
 
-type Phase = 'loading' | 'site'
+/* `leaving` is the slide-away. It is a CSS transition rather than a
+   frame-driven one: a phone that starves the frame loop would otherwise leave
+   the intro parked halfway up the screen, covering the invitation for good. */
+type Phase = 'loading' | 'leaving' | 'site'
 
 export default function App() {
   const [phase, setPhase] = useState<Phase>('loading')
@@ -24,15 +26,17 @@ export default function App() {
   }, [phase])
 
   const enterSite = () => {
-    setPhase('site')
+    setPhase('leaving')
+    // plain timers, so the hand-off completes whether or not frames are drawn
+    window.setTimeout(() => setPhase('site'), 620)
     window.setTimeout(() => setBurstSignal((n) => n + 1), 550)
   }
 
   return (
     <div dir="rtl" lang="he" className={(party ? 'party ' : '') + (customCursor ? 'cursor-none-root' : '')}>
-      <AnimatePresence>{phase === 'loading' && <SlotIntro key="slot" onDone={enterSite} />}</AnimatePresence>
+      {phase !== 'site' && <SlotIntro leaving={phase === 'leaving'} onDone={enterSite} />}
 
-      {phase === 'site' && (
+      {phase !== 'loading' && (
         <main>
           <Hero />
           <Countdown />
