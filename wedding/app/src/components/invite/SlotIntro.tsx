@@ -42,7 +42,7 @@ const TAP_SLOP = 8
 
 type Phase = 'pull' | 'spinning' | 'revealed'
 
-export default function SlotIntro({ onDone }: { onDone: () => void }) {
+export default function SlotIntro({ onDone, leaving = false }: { onDone: () => void; leaving?: boolean }) {
   const machineRef = useRef<HTMLCanvasElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const stageRef = useRef<HTMLDivElement | null>(null)
@@ -188,6 +188,11 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
     }
     startedRef.current = true
 
+    // אחרון החבל: מה שלא יקרה לקליפ או ללולאה, התאריך מופיע וההזמנה נפתחת.
+    // שתי הפעולות אידמפוטנטיות, אז במסלול התקין זה פשוט לא עושה כלום.
+    later(() => reveal(), 9000)
+    later(() => handoff(), 11500)
+
     const go = () => {
       progressRef.current = { t: -1, at: performance.now() }
       v.currentTime = 0
@@ -235,20 +240,6 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       }
       const v = videoRef.current
 
-      // רשת ביטחון אחת שמכסה הכול: קודק חסר, רשת שנפלה, נגינה שנחסמה, או
-      // קליפ שהתחיל ונתקע. במקום שעון קבוע — היעדר התקדמות. ברשת סלולרית
-      // איטית הקליפ פשוט יתחיל מאוחר יותר, וזה בסדר.
-      if (v && startedRef.current && !revealedRef.current && !rm) {
-        const pr = progressRef.current
-        if (v.currentTime > pr.t + 0.01) {
-          pr.t = v.currentTime
-          pr.at = now
-        } else if (now - pr.at > 4000) {
-          startedRef.current = false
-          staticFinish(0)
-        }
-      }
-
       if (v && !v.paused && !rm) {
         const t = v.currentTime
         while (cue < T_STOP.length && t >= T_STOP[cue]) {
@@ -267,6 +258,34 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
       cancelAnimationFrame(rafRef.current)
     }
   }, [handoff, reveal, rm, setPull, staticFinish, tick])
+
+  /* ---------- רשת ביטחון שלא תלויה בלולאת הפריימים ----------
+   * השומר ישב בתוך לולאת ה-requestAnimationFrame, וזה המקום היחיד שבו הוא
+   * אסור: טלפון שהקליפ נתקע עליו בדרך כלל מרעיב גם את לולאת הפריימים, אז
+   * השומר הפסיק לרוץ בדיוק ברגע שהיה צריך אותו — והמסך נשאר קפוא לתמיד.
+   * טיימר ממשיך לפעול גם כשפריימים לא מצוירים, אז הוא מחזיק גם את זיהוי
+   * התקיעה וגם את ציוני הדרך של הקליפ.
+   */
+  useEffect(() => {
+    if (rm) return
+    const id = window.setInterval(() => {
+      const v = videoRef.current
+      if (!v || !startedRef.current) return
+      const pr = progressRef.current
+      const now = performance.now()
+      if (v.currentTime > pr.t + 0.01) {
+        pr.t = v.currentTime
+        pr.at = now
+        // אותם ציוני דרך של הלולאה, כדי שגם בלי פריימים התאריך מגיע בזמן
+        if (v.currentTime >= T_REVEAL) reveal()
+        if (v.currentTime >= T_HANDOFF) handoff()
+      } else if (!revealedRef.current && now - pr.at > 3500) {
+        startedRef.current = false
+        staticFinish(0)
+      }
+    }, 250)
+    return () => window.clearInterval(id)
+  }, [handoff, reveal, rm, staticFinish])
 
   /* ---------- הורדת הקליפ לזיכרון מראש ----------
    * iOS מתעלם מ-`preload` על סלולרי: הוא מתחיל להוריד רק כשקוראים ל-play,
@@ -487,10 +506,8 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
   const revealed = phase === 'revealed'
 
   return (
-    <motion.div
-      className="slot-screen"
-      exit={{ y: '-100%' }}
-      transition={{ type: 'spring', bounce: 0, duration: 0.55 }}
+    <div
+      className={'slot-screen' + (leaving ? ' slot-screen--out' : '')}
       // אצבע על כל מקום במסך מפעילה את המכונה — לא צריך לפגוע בידית עצמה
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -555,7 +572,7 @@ export default function SlotIntro({ onDone }: { onDone: () => void }) {
         </div>
       </div>
       <canvas ref={confettiRef} className="slot-confetti" aria-hidden="true" />
-    </motion.div>
+    </div>
   )
 }
 
