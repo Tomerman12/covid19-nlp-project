@@ -28,6 +28,13 @@
     <meta name="twitter:title" content="שחף &amp; תומר מתחתנים · 28.10.2026" />
     <meta name="twitter:description" content="אולם אביגדור, בן אביגדור 22 תל אביב · קבלת פנים ב־19:30. משכו את הידית של מכונת המזל וההזמנה נפתחת." />
     <meta name="twitter:image" content="https://tomer-shachaf-wedding.vercel.app/media/share.jpg?v=cd02490739" />
+
+    <!-- Without these every browser asks for /favicon.ico and gets a 404, and
+         iOS asks for /apple-touch-icon.png when the invitation is added to a
+         home screen. The favicon is inlined, so it costs no request.
+         Both are drawn by tools/build_icons.py. -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%23f8f2e4%22%2F%3E%3Cg%20fill%3D%22%23c73a72%22%3E%3Ccircle%20cx%3D%2216.0%22%20cy%3D%2210.4%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%2221.3%22%20cy%3D%2214.3%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%2219.3%22%20cy%3D%2220.5%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%2212.7%22%20cy%3D%2220.5%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%2210.7%22%20cy%3D%2214.3%22%20r%3D%225%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%223.6%22%20fill%3D%22%23d9a94f%22%2F%3E%3C%2Fsvg%3E" />
+    <link rel="apple-touch-icon" href="./media/icon-180.png" />
     <script type="module" crossorigin>(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const i of document.querySelectorAll('link[rel="modulepreload"]'))n(i);new MutationObserver(i=>{for(const a of i)if(a.type==="childList")for(const l of a.addedNodes)l.tagName==="LINK"&&l.rel==="modulepreload"&&n(l)}).observe(document,{childList:!0,subtree:!0});function A(i){const a={};return i.integrity&&(a.integrity=i.integrity),i.referrerPolicy&&(a.referrerPolicy=i.referrerPolicy),i.crossOrigin==="use-credentials"?a.credentials="include":i.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function n(i){if(i.ep)return;i.ep=!0;const a=A(i);fetch(i.href,a)}})();var Id={exports:{}},xs={};/**
  * @license React
  * react-jsx-runtime.production.js
