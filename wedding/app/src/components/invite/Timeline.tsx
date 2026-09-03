@@ -109,9 +109,7 @@ export default function Timeline() {
                         >
                           {ev.time}
                         </span>
-                        {ev.range === 'עד הבוקר' ? (
-                          <span style={{ color: 'var(--muted)', fontSize: 'clamp(0.74rem, 2.5vw, 0.85rem)' }}>עד הבוקר</span>
-                        ) : (
+                        {'range' in ev && ev.range && (
                           <span
                             className="tabular"
                             dir="ltr"
