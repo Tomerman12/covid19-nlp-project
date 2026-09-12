@@ -1,0 +1,10 @@
+# Vercel deploys this repository from its root, and vercel.json points
+# outputDirectory at wedding/. Everything below is either source for that build
+# or has nothing to do with the invitation, so none of it should be uploaded.
+wedding/app/
+wedding/tools/
+wedding/README.md
+wedding/vercel.json
+wedding/.vercelignore
+*.ipynb
+README.md

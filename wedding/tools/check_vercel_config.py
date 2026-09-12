@@ -24,7 +24,13 @@ import sys
 from jsonschema import Draft202012Validator
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CONFIG = ROOT / "vercel.json"
+
+# Two configs, because which one Vercel reads depends on the project's Root
+# Directory setting, which lives in the dashboard and cannot be read from here.
+# Root Directory "wedding" makes it wedding/vercel.json; the default "/" makes
+# it the one at the repository root, whose outputDirectory points back here.
+# Both have to be valid, so both are checked.
+CONFIGS = [ROOT.parent / "vercel.json", ROOT / "vercel.json"]
 
 HEADER = {
     "type": "object",
@@ -49,6 +55,7 @@ SCHEMA = {
     "type": "object",
     "properties": {
         "$schema": {"type": "string"},
+        "outputDirectory": {"type": "string"},
         "headers": {"type": "array", "items": RULE},
         "redirects": {"type": "array"},
         "rewrites": {"type": "array"},
@@ -59,24 +66,37 @@ SCHEMA = {
 }
 
 
-def main() -> int:
+def check(path: pathlib.Path) -> int:
+    name = path.relative_to(ROOT.parent)
+    if not path.exists():
+        print(f"  {name} is missing")
+        return 1
     try:
-        config = json.loads(CONFIG.read_text(encoding="utf-8"))
+        config = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
-        print(f"vercel.json is not valid JSON: {e}")
+        print(f"  {name} is not valid JSON: {e}")
         return 1
 
     errors = sorted(Draft202012Validator(SCHEMA).iter_errors(config), key=lambda e: list(e.path))
     for e in errors:
         where = "".join(f"[{p!r}]" if isinstance(p, str) else f"[{p}]" for p in e.path) or "(root)"
-        print(f"  {where}  {e.message}")
+        print(f"  {name}{where}  {e.message}")
     if errors:
-        print(f"\n{len(errors)} problem(s) in {CONFIG.relative_to(ROOT.parent)}")
-        return 1
+        return len(errors)
 
     rules = config.get("headers", [])
     keys = sum(len(r["headers"]) for r in rules)
-    print(f"vercel.json valid: {len(rules)} header rule(s), {keys} header(s)")
+    out = config.get("outputDirectory")
+    extra = f", serving {out}/" if out else ""
+    print(f"  {name} valid: {len(rules)} header rule(s), {keys} header(s){extra}")
+    return 0
+
+
+def main() -> int:
+    problems = sum(check(p) for p in CONFIGS)
+    if problems:
+        print(f"\n{problems} problem(s)")
+        return 1
     return 0
 
 
