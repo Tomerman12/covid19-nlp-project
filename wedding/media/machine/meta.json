@@ -1,10 +1,10 @@
 {
-  "version": "de1d126372",
+  "version": "1babc7d2b5",
   "size": [
     526,
     1094
   ],
-  "pullFrames": 37,
+  "pullFrames": 19,
   "videoStartsAtSourceT": 1.5,
   "videoFrames": 202,
   "videoDuration": 8.417

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { ConfettiEngine } from '@/lib/confetti'
 import { SONG_URL, SONG_LABEL } from '@/lib/wedding'
-import chorusUrl from '@/assets/chorus.m4a'
+import { media } from '@/lib/media'
 
 /* light reflections the disco ball scatters around the room — pastel set */
 const SPOTS = [
@@ -98,7 +98,9 @@ export default function PartyLayer({
 
   return (
     <>
-      <audio ref={audioRef} src={chorusUrl} loop preload="auto" />
+      {/* preload="none": the song is 395 KB and most guests never press the
+          button. It starts downloading inside the click that plays it. */}
+      <audio ref={audioRef} src={media('chorus.m4a')} loop preload="none" />
       <div className="beams" aria-hidden="true" />
       <div className="spots" aria-hidden="true">
         {SPOTS.map((s, i) => (

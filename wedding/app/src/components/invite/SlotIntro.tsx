@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { COUPLE_EN, DATE_LABEL } from '@/lib/wedding'
-import { MACHINE_VERSION } from '@/lib/machineVersion'
+import { media } from '@/lib/media'
 import { ConfettiEngine } from '@/lib/confetti'
 
 /* ---------------------------------------------------------------------------
@@ -16,18 +16,13 @@ import { ConfettiEngine } from '@/lib/confetti'
  * של המכונה עצמה. מה שיוצא הוא מדיה אטומה רגילה שהרקע שלה *הוא* העמוד: בלי
  * ערוץ אלפא, בלי קודק מיוחד, ובלי מסגרת שנראית.
  *
- *   media/machine/pull/01..37.webp   הידית יורדת, פריים לכל שלב
+ *   media/machine/pull/01..19.webp   הידית יורדת, פריים לכל שלב
  *   media/machine/spin.webm|.mp4     מרגע השחרור: הסיבוב, הנעילה, הקונפטי
  *
  * שני החלקים חתוכים באותו crop וממשיכים זה את זה על אותו פריים בדיוק.
  * ------------------------------------------------------------------------- */
 
-const inlined: Record<string, string> | undefined = (window as any).__WEDDING_MEDIA__
-/* the version stamp makes a rebuild a different URL, so a stale cache can never
-   serve last week's machine inside this week's page */
-const media = (name: string) => inlined?.[name] ?? `media/${name}?v=${MACHINE_VERSION}`
-
-const PULL_FRAMES = 37
+const PULL_FRAMES = 19
 const frameSrc = (i: number) => media(`machine/pull/${String(i + 1).padStart(2, '0')}.webp`)
 
 /* ציוני הדרך בתוך spin.webm (שניות) — נמדדו מהקליפ החתוך עצמו */
@@ -119,10 +114,27 @@ export default function SlotIntro({ onDone, leaving = false }: { onDone: () => v
   const paint = useCallback(() => {
     const c = machineRef.current
     if (!c || !c.width) return
-    const i = Math.max(0, Math.min(PULL_FRAMES - 1, Math.round(rubber(pull.current) * (PULL_FRAMES - 1))))
-    if (i === shownFrame.current) return
+    const want = Math.max(0, Math.min(PULL_FRAMES - 1, Math.round(rubber(pull.current) * (PULL_FRAMES - 1))))
+    if (want === shownFrame.current) return
+    // The frames stream in rather than all arriving before the machine is
+    // usable, so on a slow link the one we want may not be here yet. Show the
+    // nearest that is: the lever lags a step instead of the canvas going blank.
+    let i = want
+    const has = (n: number) => {
+      const im = framesRef.current[n]
+      return !!im?.complete && im.naturalWidth > 0
+    }
+    if (!has(i)) {
+      let found = -1
+      for (let d = 1; d < PULL_FRAMES; d++) {
+        if (want - d >= 0 && has(want - d)) { found = want - d; break }
+        if (want + d < PULL_FRAMES && has(want + d)) { found = want + d; break }
+      }
+      if (found < 0) return
+      i = found
+    }
     const img = framesRef.current[i]
-    if (!img?.complete || !img.naturalWidth) return
+    if (!img) return
     c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height)
     if (Math.abs(i - lastTickFrame.current) >= 3) {
       lastTickFrame.current = i
@@ -348,9 +360,13 @@ export default function SlotIntro({ onDone, leaving = false }: { onDone: () => v
     let loaded = 0
     const imgs: HTMLImageElement[] = []
     framesRef.current = imgs
+    // The lever only needs its resting frame to be usable. Waiting for all
+    // of them meant that on a slow link the machine sat dim until the last
+    // one landed — 333 KB of lever before anything could be touched. The rest
+    // stream in behind it and paint() shows the nearest one that has arrived.
     const settle = () => {
       if (!alive) return
-      if (++loaded >= PULL_FRAMES) setReady(true)
+      loaded++
     }
     for (let i = 0; i < PULL_FRAMES; i++) {
       const img = new Image()
@@ -359,6 +375,7 @@ export default function SlotIntro({ onDone, leaving = false }: { onDone: () => v
         if (i === 0) {
           sizeCanvas()
           paint()
+          setReady(true)
         }
         settle()
       }
